@@ -39,3 +39,5 @@ function listOrderDetails(request,response) {
       }
    )
 }
+
+module.exports = listOrderDetails;
