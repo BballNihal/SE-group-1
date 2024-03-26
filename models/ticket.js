@@ -44,7 +44,7 @@ exports.getTicketDetails = (ticketId, callback) => {
           return;
       }
       if (!ticket) {
-          callback(null, null); // No ticket found
+          callback(null, null); // No ticket found, return null instead of crashing
           return;
       }
 

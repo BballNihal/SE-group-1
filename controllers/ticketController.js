@@ -36,7 +36,7 @@ exports.getTicketDetails = (req, res) => {
         if (err) {
             res.statusCode = 500;
             res.end(JSON.stringify({ error: "Error fetching ticket details", details: err }));
-        } else if (ticketDetails.length === 0) {
+        } else if (!ticketDetails) {
             res.statusCode = 404;
             res.end(JSON.stringify({ error: "Ticket not found" }));
         } else {
