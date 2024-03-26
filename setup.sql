@@ -12,6 +12,22 @@ availability bit,
 productID varchar(17),
 id int PRIMARY KEY AUTO_INCREMENT
 );
+CREATE TABLE orders(
+cartID VARCHAR(100) NOT NULL,
+paymeentInfo varchar(17),
+discountCode float,
+price float,
+orderID VARCHAR(100) NOT NULL,
+memberID VARCHAR(100),
+status VARCHAR(100),
+id int PRIMARY KEY AUTO_INCREMENT
+);
+CREATE TABLE appointments(
+memberID VARCHAR(100),
+time VARCHAR(100),
+Specification varchar(100),
+id int PRIMARY KEY AUTO_INCREMENT
+);
 CREATE TABLE cart (
 cartID VARCHAR(100) NOT NULL,
 productID VARCHAR(100) NOT NULL,

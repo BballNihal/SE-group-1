@@ -1,7 +1,7 @@
 The SQL code to initizalize the database is here:
 (use carefully, it will delete the previous data)
 
-CREATE DATABASE IF NOT EXISTS SHOP;
+cartCREATE DATABASE IF NOT EXISTS SHOP;
 USE SHOP;
 DROP TABLE IF EXISTS cart;
 DROP TABLE IF EXISTS products;
@@ -13,6 +13,22 @@ price float,
 premiumStatus bit,
 availability bit,
 productID varchar(17),
+id int PRIMARY KEY AUTO_INCREMENT
+);
+CREATE TABLE orders(
+cartID VARCHAR(100) NOT NULL,
+paymeentInfo varchar(17),
+discountCode float,
+price float,
+orderID VARCHAR(100) NOT NULL,
+memberID VARCHAR(100),
+status VARCHAR(100),
+id int PRIMARY KEY AUTO_INCREMENT
+);
+CREATE TABLE appointments(
+memberID VARCHAR(100),
+time VARCHAR(100),
+Specification varchar(100),
 id int PRIMARY KEY AUTO_INCREMENT
 );
 CREATE TABLE cart (

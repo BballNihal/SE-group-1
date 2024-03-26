@@ -4,7 +4,7 @@ POST cart/createCart
 format:
 {
    "ABC":{
-    "memberID":"M1234567890123456",
+    "memberID":"M1234567890123456", (for guest just put null)
    }
 }
 */
@@ -24,7 +24,7 @@ function createCart(request,response) {
         for (i in body) {
             if (body[i] instanceof Object) {
                 //encryption of member id and current time as cart id in 6 digit
-                var cartID = encrytionID(body[i].memberID);
+                var cartID = encrytionID(6,body[i].memberID);
                 //insert cart id into cart table while all other values are null
                 sqlStatement = "INSERT INTO cart(cartID, productID, quantity)";
                 sqlStatement+= "VALUES ('"+cartID+"',null,null);";
