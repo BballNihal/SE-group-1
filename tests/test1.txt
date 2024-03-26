@@ -1,0 +1,9 @@
+{
+    "Anevent":{
+    "attendee":"AMELIA",
+    "dtstart":"20240318T092832",
+    "dtstamp":"20240306T085045",
+    "method":"REQUEST",
+    "statusValue":"CONFIRMED"
+    }
+}

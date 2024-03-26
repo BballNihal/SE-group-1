@@ -1,0 +1,9 @@
+{
+    "Event":{
+    "attendee":"ALFONZO",
+    "dtstart":"20240320T033408",
+    "dtstamp":"20240307T155621",
+    "method":"UNKNOWN",
+    "statusValue":"CONFIRMED"
+    }
+}

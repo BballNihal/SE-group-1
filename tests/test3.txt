@@ -1,0 +1,9 @@
+{
+    "Event":{
+    "attendee":"WILLIAM",
+    "dtstart":"20240320T033408",
+    "dtstamp":"20240307T155621",
+    "method":"REQUEST",
+    "statusValue":"UNKNOWN"
+    }
+}
