@@ -2,6 +2,9 @@ const http = require('http');
 const url = require('url');
 const ticketController = require('./controllers/ticketController');
 
+// Require db.js here to ensure database initialization occurs
+require('./models/db');
+
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -18,7 +21,7 @@ const server = http.createServer((req, res) => {
         body += chunk.toString(); // Convert Buffer to string
     });
     req.on('end', () => {
-        // Parse the body to JSON
+        // Parse the body to JSON, if any
         let data = {};
         try {
             if (body) data = JSON.parse(body);
@@ -28,21 +31,16 @@ const server = http.createServer((req, res) => {
             return;
         }
 
-        // Handling different routes based on the path and method
+        // Modified route handling logic to pass request data correctly
         if (path === '/tickets/create' && method === 'POST') {
-            req.body = data; // Add parsed data back to request object
-            ticketController.createTicket(req, res);
+            ticketController.createTicket({ body: data }, res);
         } else if (path === '/tickets/reply' && method === 'POST') {
-            req.body = data;
-            ticketController.addReplyToTicket(req, res);
-        } else if (path.match(/\/tickets\/\d+$/) && method === 'GET') {
-            // Extract ticketId from the URL
-            const ticketId = path.split("/")[2];
-            req.params = { ticketId }; // Add ticketId to request object
-            ticketController.getTicketDetails(req, res);
-        } else if (path === '/tickets/reopen' && method === 'POST') {
-            req.body = data;
-            ticketController.reopenTicket(req, res);
+            ticketController.addReplyToTicket({ body: data }, res);
+        } else if (path.startsWith('/tickets/details/') && method === 'GET') {
+            const ticketId = path.split('/')[3];
+            ticketController.getTicketDetails({ params: { ticketId } }, res);
+        } else if (path === '/tickets/reopen' && method === 'PUT') {
+            ticketController.reopenTicket({ body: data }, res);
         } else {
             res.statusCode = 404;
             res.end(JSON.stringify({ message: "Route not found." }));
