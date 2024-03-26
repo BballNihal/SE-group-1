@@ -28,3 +28,26 @@ function getTicketDetails(ticketId, callback) {
     callback(err, rows);
   });
 }
+
+function reopenTicket(ticketId, callback) {
+  const sql = `UPDATE SupportTickets SET Status = 'Open' WHERE TicketID = ?`;
+  db.run(sql, [ticketId], function(err) {
+    if (err) {
+      callback(err);
+    } else {
+      // Check if the ticket was successfully updated; `this.changes` indicates the number of rows affected
+      if (this.changes > 0) {
+        callback(null, { message: 'Ticket reopened successfully.' });
+      } else {
+        callback(new Error('Ticket not found.'));
+      }
+    }
+  });
+}
+
+module.exports = {
+  createTicket,
+  addReplyToTicket,
+  getTicketDetails,
+  reopenTicket, // Make sure to export the new function
+};
