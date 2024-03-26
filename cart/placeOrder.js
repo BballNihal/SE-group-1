@@ -29,6 +29,7 @@ function placeOrder(request,response) {
         body = JSON.parse(prebody);
         //generate order id by encrytion of cart id and current time
         var orderID = encrytionID(8,body.cartID);
+        orderID = "O"+orderID;
         for (i in body) {
           if (body[i] instanceof Object) {
             if(verify("discountCode",body[i].discountCode) & verify("cart",body[i].cartID)&verify("string",body[i].paymentInfo)&!isNaN(body[i].price))  {

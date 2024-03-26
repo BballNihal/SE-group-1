@@ -11,6 +11,8 @@ function createCart(memberID) {
     let resMsg = {};
     var dBCon = connectToDatabase();
     var cartID = encryptionID(10, memberID);
+    //add C to the beginning of the cartID
+    cartID = "C"+cartID;
     var sqlStatement = "INSERT INTO cart(cartID, memberID) VALUES ('"+cartID+"','"+memberID+"');";
     console.log(sqlStatement);
     dBCon.query(sqlStatement, function (err, result) {
