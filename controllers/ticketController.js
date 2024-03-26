@@ -1,49 +1,53 @@
 const TicketModel = require('../models/ticket');
 
-// Handle creating a new ticket
 exports.createTicket = (req, res) => {
   const { userId, subject, description } = req.body;
   TicketModel.createTicket(userId, subject, description, (err, ticketId) => {
     if (err) {
-      res.status(500).send({ message: 'Error creating ticket' });
+      res.writeHead(500);
+      res.end(JSON.stringify({ message: 'Error creating ticket' }));
     } else {
-      res.status(201).send({ message: 'Ticket created successfully', ticketId: ticketId });
+      res.writeHead(201);
+      res.end(JSON.stringify({ message: 'Ticket created successfully', ticketId }));
     }
   });
 };
 
-// Handle adding a reply to a ticket
 exports.addReplyToTicket = (req, res) => {
   const { ticketId, userId, message } = req.body;
   TicketModel.addReplyToTicket(ticketId, userId, message, (err, replyId) => {
     if (err) {
-      res.status(500).send({ message: 'Error adding reply to ticket' });
+      res.writeHead(500);
+      res.end(JSON.stringify({ message: 'Error adding reply to ticket' }));
     } else {
-      res.status(200).send({ message: 'Reply added successfully', replyId: replyId });
+      res.writeHead(200);
+      res.end(JSON.stringify({ message: 'Reply added successfully', replyId }));
     }
   });
 };
 
-// Handle fetching ticket details, including replies
 exports.getTicketDetails = (req, res) => {
-  const { ticketId } = req.params; // Assuming ticketId is passed as a URL parameter
+  const ticketId = req.params.ticketId;
   TicketModel.getTicketDetails(ticketId, (err, ticketDetails) => {
     if (err) {
-      res.status(500).send({ message: 'Error fetching ticket details' });
+      res.writeHead(500);
+      res.end(JSON.stringify({ message: 'Error fetching ticket details' }));
     } else {
-      res.status(200).send(ticketDetails);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(ticketDetails));
     }
   });
 };
 
-// Handle reopening a ticket
 exports.reopenTicket = (req, res) => {
-  const { ticketId } = req.body; // Assuming ticketId is passed in the request body
-  TicketModel.reopenTicket(ticketId, (err, response) => {
+  const { ticketId } = req.body;
+  TicketModel.reopenTicket(ticketId, (err) => {
     if (err) {
-      res.status(500).send({ message: 'Error reopening ticket' });
+      res.writeHead(500);
+      res.end(JSON.stringify({ message: 'Error reopening ticket' }));
     } else {
-      res.status(200).send(response);
+      res.writeHead(200);
+      res.end(JSON.stringify({ message: 'Ticket reopened successfully' }));
     }
   });
 };

@@ -1,58 +1,55 @@
 const http = require('http');
 const url = require('url');
-// Assuming you have a controller set up similar to what was described
-const { createTicket, addReplyToTicket, getTicketDetails, reopenTicket } = require('./controllers/ticketController');
+const ticketController = require('./controllers/ticketController');
 
 const hostname = '127.0.0.1';
 const port = 3000;
 
 const server = http.createServer((req, res) => {
-  const parsedUrl = url.parse(req.url, true);
-  const path = parsedUrl.pathname;
-  const trimmedPath = path.replace(/^\/+|\/+$/g, '');
+    const parsedUrl = url.parse(req.url, true);
+    const path = parsedUrl.pathname;
+    const method = req.method.toUpperCase();
 
-  // Parsing request method
-  const method = req.method.toUpperCase();
+    // Set up headers for JSON response
+    res.setHeader('Content-Type', 'application/json');
 
-  // Helper function to read body data
-  const getRequestBody = (req, callback) => {
     let body = '';
-    req.on('data', (chunk) => {
-      body += chunk.toString(); // convert Buffer to string
+    req.on('data', chunk => {
+        body += chunk.toString(); // Convert Buffer to string
     });
     req.on('end', () => {
-      callback(body);
-    });
-  };
+        // Parse the body to JSON
+        let data = {};
+        try {
+            if (body) data = JSON.parse(body);
+        } catch (e) {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: "Invalid JSON body." }));
+            return;
+        }
 
-  // Routing
-  if (trimmedPath === 'tickets/create' && method === 'POST') {
-    getRequestBody(req, (body) => {
-      // Convert the body string to a JSON object
-      const requestData = JSON.parse(body);
-      createTicket(requestData, res);
+        // Handling different routes based on the path and method
+        if (path === '/tickets/create' && method === 'POST') {
+            req.body = data; // Add parsed data back to request object
+            ticketController.createTicket(req, res);
+        } else if (path === '/tickets/reply' && method === 'POST') {
+            req.body = data;
+            ticketController.addReplyToTicket(req, res);
+        } else if (path.match(/\/tickets\/\d+$/) && method === 'GET') {
+            // Extract ticketId from the URL
+            const ticketId = path.split("/")[2];
+            req.params = { ticketId }; // Add ticketId to request object
+            ticketController.getTicketDetails(req, res);
+        } else if (path === '/tickets/reopen' && method === 'POST') {
+            req.body = data;
+            ticketController.reopenTicket(req, res);
+        } else {
+            res.statusCode = 404;
+            res.end(JSON.stringify({ message: "Route not found." }));
+        }
     });
-  } else if (trimmedPath === 'tickets/reply' && method === 'POST') {
-    getRequestBody(req, (body) => {
-      const requestData = JSON.parse(body);
-      addReplyToTicket(requestData, res);
-    });
-  } else if (trimmedPath.match(/^tickets\/details\/\d+$/) && method === 'GET') {
-    // Extract ticketId from the URL
-    const ticketId = trimmedPath.split('/')[2];
-    getTicketDetails(ticketId, res);
-  } else if (trimmedPath === 'tickets/reopen' && method === 'PUT') {
-    getRequestBody(req, (body) => {
-      const requestData = JSON.parse(body);
-      reopenTicket(requestData, res);
-    });
-  } else {
-    // Not Found handler
-    res.writeHead(404);
-    res.end('Not Found');
-  }
 });
 
 server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+    console.log(`Server running at http://${hostname}:${port}/`);
 });

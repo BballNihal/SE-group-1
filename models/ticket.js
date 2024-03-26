@@ -1,53 +1,36 @@
-const db = require('../database/db.js');
+const db = require('../database/db');
 
-function createTicket(userId, subject, description, callback) {
-  const sql = `INSERT INTO SupportTickets (UserID, Subject, Description) VALUES (?, ?, ?)`;
+
+exports.createTicket = (userId, subject, description, callback) => {
+  const sql = `INSERT INTO SupportTickets (UserID, Subject, Description, Status) VALUES (?, ?, ?, 'Open')`;
   db.run(sql, [userId, subject, description], function(err) {
     callback(err, this.lastID);
   });
-}
+};
 
-function addReplyToTicket(ticketId, userId, message, callback) {
+exports.addReplyToTicket = (ticketId, userId, message, callback) => {
   const sql = `INSERT INTO TicketReplies (TicketID, UserID, Message) VALUES (?, ?, ?)`;
   db.run(sql, [ticketId, userId, message], function(err) {
     callback(err, this.lastID);
   });
-}
+};
 
-function getTicketDetails(ticketId, callback) {
-  const sql = `
-    SELECT t.TicketID, t.Subject, t.Description, t.Status, t.CreatedAt, 
-           r.ReplyID, r.Message, r.ReplyAt, u.Username AS Replier 
-    FROM SupportTickets t
-    LEFT JOIN TicketReplies r ON t.TicketID = r.TicketID
-    LEFT JOIN Users u ON r.UserID = u.UserID
-    WHERE t.TicketID = ?
-    ORDER BY r.ReplyAt ASC
-  `;
-  db.all(sql, [ticketId], function(err, rows) {
-    callback(err, rows);
+exports.getTicketDetails = (ticketId, callback) => {
+  const ticketSql = `SELECT * FROM SupportTickets WHERE TicketID = ?`;
+  const repliesSql = `SELECT * FROM TicketReplies WHERE TicketID = ? ORDER BY CreatedAt ASC`;
+
+  db.get(ticketSql, [ticketId], (err, ticket) => {
+    if (err) return callback(err);
+    db.all(repliesSql, [ticketId], (err, replies) => {
+      if (err) return callback(err);
+      callback(null, { ...ticket, replies });
+    });
   });
-}
+};
 
-function reopenTicket(ticketId, callback) {
+exports.reopenTicket = (ticketId, callback) => {
   const sql = `UPDATE SupportTickets SET Status = 'Open' WHERE TicketID = ?`;
-  db.run(sql, [ticketId], function(err) {
-    if (err) {
-      callback(err);
-    } else {
-      // Check if the ticket was successfully updated; `this.changes` indicates the number of rows affected
-      if (this.changes > 0) {
-        callback(null, { message: 'Ticket reopened successfully.' });
-      } else {
-        callback(new Error('Ticket not found.'));
-      }
-    }
+  db.run(sql, [ticketId], (err) => {
+    callback(err);
   });
-}
-
-module.exports = {
-  createTicket,
-  addReplyToTicket,
-  getTicketDetails,
-  reopenTicket, // Make sure to export the new function
 };
