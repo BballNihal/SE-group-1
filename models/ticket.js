@@ -23,11 +23,18 @@ exports.createTicket = (userId, subject, description, callback) => {
 
 
 exports.addReplyToTicket = (ticketId, userId, message, callback) => {
-    const sql = `INSERT INTO TicketReplies (TicketID, UserID, Message) VALUES (?, ?, ?)`;
-    db.run(sql, [ticketId, userId, message], function(err) {
-        callback(err, this.lastID); // this.lastID returns the id of the newly inserted reply
-    });
+  console.log(`Adding reply to ticket: `, { ticketId, userId, message });
+  
+  const sql = `INSERT INTO TicketReplies (TicketID, UserID, Message) VALUES (?, ?, ?)`;
+  db.run(sql, [ticketId, userId, message], function(err) {
+      if (err) {
+          console.error("Error inserting reply into database:", err);
+          return callback(err);
+      }
+      callback(null, this.lastID);
+  });
 };
+
 
 exports.getTicketDetails = (ticketId, callback) => {
   // First, fetch the ticket details
@@ -61,8 +68,16 @@ exports.getTicketDetails = (ticketId, callback) => {
 
 
 exports.reopenTicket = (ticketId, callback) => {
-    const sql = `UPDATE Tickets SET Status = 'Open' WHERE TicketId = ?`;
-    db.run(sql, [ticketId], function(err) {
-        callback(err, { message: 'Ticket reopened successfully' });
-    });
+  // Corrected table name from 'Tickets' to 'SupportTickets'
+  const sql = `UPDATE SupportTickets SET Status = 'Open' WHERE TicketID = ?`;
+  db.run(sql, [ticketId], function(err) {
+      if (err) {
+          console.error("Error reopening ticket in the database:", err);
+          callback(err);
+      } else {
+          console.log(`Ticket ${ticketId} has been reopened.`);
+          callback(null, { message: 'Ticket reopened successfully' });
+      }
+  });
 };
+

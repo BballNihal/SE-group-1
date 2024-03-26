@@ -35,7 +35,7 @@ const server = http.createServer((req, res) => {
         if (path === '/tickets/create' && method === 'POST') {
             ticketController.createTicket({ body: data }, res);
         } else if (path === '/tickets/reply' && method === 'POST') {
-            ticketController.addReplyToTicket({ body: data }, res);
+            ticketController.addReplyToTicket(data, res);
         } else if (path.startsWith('/tickets/details/') && method === 'GET') {
             const ticketId = path.split('/')[3];
             ticketController.getTicketDetails({ params: { ticketId } }, res);
