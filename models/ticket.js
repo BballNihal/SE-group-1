@@ -30,15 +30,35 @@ exports.addReplyToTicket = (ticketId, userId, message, callback) => {
 };
 
 exports.getTicketDetails = (ticketId, callback) => {
-    const sql = `
-        SELECT * FROM Tickets WHERE TicketId = ?
-        UNION ALL
-        SELECT * FROM TicketReplies WHERE TicketId = ? ORDER BY ReplyID ASC
-    `;
-    db.all(sql, [ticketId, ticketId], (err, rows) => {
-        callback(err, rows);
-    });
+  // First, fetch the ticket details
+  db.get("SELECT * FROM SupportTickets WHERE TicketID = ?", [ticketId], (err, ticket) => {
+      if (err) {
+          callback(err);
+          return;
+      }
+      if (!ticket) {
+          callback(null, null); // No ticket found
+          return;
+      }
+
+      // Then, fetch the replies for the ticket
+      db.all("SELECT * FROM TicketReplies WHERE TicketID = ? ORDER BY ReplyID ASC", [ticketId], (err, replies) => {
+          if (err) {
+              callback(err);
+              return;
+          }
+
+          // Combine the ticket with its replies
+          const result = {
+              ...ticket,
+              Replies: replies
+          };
+
+          callback(null, result);
+      });
+  });
 };
+
 
 exports.reopenTicket = (ticketId, callback) => {
     const sql = `UPDATE Tickets SET Status = 'Open' WHERE TicketId = ?`;

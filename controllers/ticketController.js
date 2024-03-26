@@ -32,17 +32,23 @@ exports.addReplyToTicket = (data, res) => {
     });
 };
 
-exports.getTicketDetails = (ticketId, res) => {
+exports.getTicketDetails = (req, res) => {
+    const { ticketId } = req.params; // Ensure you're extracting ticketId correctly
+
     ticketModel.getTicketDetails(ticketId, (err, ticketDetails) => {
-        if (err || !ticketDetails) {
-            res.writeHead(404);
-            res.end(JSON.stringify({ error: 'Ticket not found' }));
+        if (err) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: "Error fetching ticket details", details: err }));
+        } else if (ticketDetails.length === 0) {
+            res.statusCode = 404;
+            res.end(JSON.stringify({ error: "Ticket not found" }));
         } else {
-            res.writeHead(200);
+            res.statusCode = 200;
             res.end(JSON.stringify(ticketDetails));
         }
     });
 };
+
 
 exports.reopenTicket = (data, res) => {
     const { ticketId } = data;
