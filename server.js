@@ -40,8 +40,19 @@ const server = http.createServer((req, res) => {
             const ticketId = path.split('/')[3];
             ticketController.getTicketDetails({ params: { ticketId } }, res);
         } else if (path === '/tickets/reopen' && method === 'PUT') {
-            ticketController.reopenTicket({ body: data }, res);
-        } else {
+
+        } 
+        else if (path.startsWith('/tickets/close/') && method === 'POST') {
+            const ticketId = path.split('/')[3]; // Extracting ticket ID from the URL
+            // Assuming you have a function in your ticketController for closing a ticket
+            ticketController.closeTicket({ params: { ticketId } }, res);
+        }
+        else if (path.startsWith('/tickets/open/') && method === 'POST') {
+            const ticketId = path.split('/')[3]; // Extracting ticket ID from the URL
+            // Assuming you have a function in your ticketController for closing a ticket
+            ticketController.openTicket({ params: { ticketId } }, res);
+        }
+        else {
             res.statusCode = 404;
             res.end(JSON.stringify({ message: "Route not found." }));
         }
