@@ -66,18 +66,54 @@ exports.getTicketDetails = (ticketId, callback) => {
   });
 };
 
+exports.closeTicket = (ticketId, callback) => {
+  db.get(`SELECT Status FROM SupportTickets WHERE TicketID = ?`, [ticketId], (err, row) => {
+    if (err) {
+      console.error("Error fetching ticket status:", err);
+      return callback(err);
+    }
+    if (!row) {
+      return callback(null, { message: 'Ticket not found' });
+    }
+    if (row.Status === 'Closed') {
+      return callback(null, { message: 'Ticket already closed' });
+    }
 
-exports.reopenTicket = (ticketId, callback) => {
-  // Corrected table name from 'Tickets' to 'SupportTickets'
-  const sql = `UPDATE SupportTickets SET Status = 'Open' WHERE TicketID = ?`;
-  db.run(sql, [ticketId], function(err) {
-      if (err) {
-          console.error("Error reopening ticket in the database:", err);
-          callback(err);
-      } else {
-          console.log(`Ticket ${ticketId} has been reopened.`);
-          callback(null, { message: 'Ticket reopened successfully' });
-      }
+    const sql = `UPDATE SupportTickets SET Status = 'Closed' WHERE TicketID = ?`;
+    db.run(sql, [ticketId], function(err) {
+        if (err) {
+            console.error("Error closing ticket:", err);
+            callback(err);
+        } else {
+            console.log(`Ticket with ID ${ticketId} has been closed.`);
+            callback(null, { message: 'Ticket closed successfully' });
+        }
+    });
   });
 };
 
+exports.openTicket = (ticketId, callback) => {
+  db.get(`SELECT Status FROM SupportTickets WHERE TicketID = ?`, [ticketId], (err, row) => {
+    if (err) {
+      console.error("Error fetching ticket status:", err);
+      return callback(err);
+    }
+    if (!row) {
+      return callback(null, { message: 'Ticket not found' });
+    }
+    if (row.Status === 'Open') {
+      return callback(null, { message: 'Ticket already open' });
+    }
+
+    const sql = `UPDATE SupportTickets SET Status = 'Open' WHERE TicketID = ?`;
+    db.run(sql, [ticketId], function(err) {
+        if (err) {
+            console.error("Error opening ticket:", err);
+            callback(err);
+        } else {
+            console.log(`Ticket with ID ${ticketId} has been opened.`);
+            callback(null, { message: 'Ticket opened successfully' });
+        }
+    });
+  });
+};

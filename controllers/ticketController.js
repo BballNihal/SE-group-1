@@ -46,6 +46,34 @@ exports.getTicketDetails = (req, res) => {
     });
 };
 
+exports.closeTicket = (req, res) => {
+    const { ticketId } = req.params; // Assuming ticketId is passed as a URL parameter
+
+    ticketModel.closeTicket(ticketId, (err, result) => {
+        if (err) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Failed to close ticket' }));
+        } else {
+            res.writeHead(200);
+            res.end(JSON.stringify(result));
+        }
+    });
+};
+
+exports.openTicket = (req, res) => {
+    const { ticketId } = req.params; // Assuming ticketId is passed as a URL parameter
+
+    ticketModel.openTicket(ticketId, (err, result) => {
+        if (err) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Failed to open ticket' }));
+        } else {
+            res.writeHead(200);
+            res.end(JSON.stringify(result));
+        }
+    });
+};
+
 
 exports.reopenTicket = (data, res) => {
     const { ticketId } = data;
