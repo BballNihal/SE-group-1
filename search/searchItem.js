@@ -27,7 +27,7 @@ function searchItem(request, response) {
       setHeader(resMsg, response);
       response.writeHead(resMsg.code, { "Content-Type": "text/plain" });
       response.end(resMsg.body);
-      return;
+      return resMsg.body;
   }
 
   // Construct SQL statement to search cart table based on member ID
@@ -45,7 +45,7 @@ function searchItem(request, response) {
           const productIDs = results.map(result => result.productID);
           resMsg.code = 200;
           resMsg.body = productIDs; // Directly assign the array of productIDs
-          return resMsg.body;
+         
       }
 
       // Send response
@@ -53,6 +53,8 @@ function searchItem(request, response) {
       response.end(JSON.stringify(resMsg.body)); // Convert the array to JSON string before sending
       // Close the database connection
       dBCon.end();
+
+      return resMsg.body;
   });
 }
 

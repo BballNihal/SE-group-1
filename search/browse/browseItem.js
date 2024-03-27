@@ -22,7 +22,7 @@ function browseItem(request, response) {
         };
         response.writeHead(resMsg.code, { "Content-Type": "application/json" });
         response.end(JSON.stringify(resMsg.body));
-        return;
+        return resMsg.body;
     }
 
     // Construct SQL statement to search products table based on product ID
