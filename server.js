@@ -13,6 +13,8 @@ const server = http.createServer((req, res) => {
     const path = parsedUrl.pathname;
     const method = req.method.toUpperCase();
 
+    const queryParams = parsedUrl.query;
+
     // Set up headers for JSON response
     res.setHeader('Content-Type', 'application/json');
 
@@ -38,17 +40,22 @@ const server = http.createServer((req, res) => {
             ticketController.addReplyToTicket(data, res);
         } else if (path.startsWith('/tickets/details/') && method === 'GET') {
             const ticketId = path.split('/')[3];
-            ticketController.getTicketDetails({ params: { ticketId } }, res);
+            // Now passing both params and query in the request object
+            const request = {
+                params: { ticketId },
+                query: queryParams // Include parsed query parameters
+            };
+            ticketController.getTicketDetails(request, res);
         }
         else if (path.startsWith('/tickets/close/') && method === 'POST') {
             const ticketId = path.split('/')[3]; // Extracting ticket ID from the URL
             // Assuming you have a function in your ticketController for closing a ticket
-            ticketController.closeTicket({ params: { ticketId } }, res);
+            ticketController.closeTicket({ params: { ticketId }, body: data }, res);
         }
         else if (path.startsWith('/tickets/open/') && method === 'POST') {
             const ticketId = path.split('/')[3]; // Extracting ticket ID from the URL
             // Assuming you have a function in your ticketController for closing a ticket
-            ticketController.openTicket({ params: { ticketId } }, res);
+            ticketController.openTicket({ params: { ticketId }, body: data }, res);
         }else if (path.startsWith('/tickets/faqs') && method === 'GET') {
             ticketController.getFAQs(req, res);
         }else {

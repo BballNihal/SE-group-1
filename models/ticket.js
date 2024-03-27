@@ -66,6 +66,23 @@ exports.getTicketDetails = (ticketId, callback) => {
   });
 };
 
+exports.getTicketOwner = (ticketId, callback) => {
+  const sql = 'SELECT UserID FROM SupportTickets WHERE TicketID = ?';
+  db.get(sql, [ticketId], (err, row) => {
+      if (err) {
+          callback(err);
+          return;
+      }
+      if (row) {
+          callback(null, row.UserID);
+      } else {
+          // Ticket not found
+          callback(new Error('Ticket not found'));
+      }
+  });
+};
+
+
 exports.closeTicket = (ticketId, callback) => {
   db.get(`SELECT Status FROM SupportTickets WHERE TicketID = ?`, [ticketId], (err, row) => {
     if (err) {
