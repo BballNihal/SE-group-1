@@ -39,9 +39,7 @@ const server = http.createServer((req, res) => {
         } else if (path.startsWith('/tickets/details/') && method === 'GET') {
             const ticketId = path.split('/')[3];
             ticketController.getTicketDetails({ params: { ticketId } }, res);
-        } else if (path === '/tickets/reopen' && method === 'PUT') {
-
-        } 
+        }
         else if (path.startsWith('/tickets/close/') && method === 'POST') {
             const ticketId = path.split('/')[3]; // Extracting ticket ID from the URL
             // Assuming you have a function in your ticketController for closing a ticket
