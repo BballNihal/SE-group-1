@@ -2,6 +2,8 @@ const { Builder, By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const fs = require('fs');
 
+// pulled from https://www.discounttiredirect.com/customer-service/faqs
+
 async function scrapeFAQs() {
     let options = new chrome.Options();
     options.addArguments('--headless'); // Set Chrome to run in headless mode
