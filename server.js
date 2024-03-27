@@ -2,7 +2,6 @@ const http = require('http');
 const url = require('url');
 const ticketController = require('./controllers/ticketController');
 
-// Require db.js here to ensure database initialization occurs
 require('./models/db');
 
 const hostname = '127.0.0.1';

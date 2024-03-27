@@ -2,16 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const ticketModel = require('../models/ticket');
 
-// Helper function to check if a user is a guest
 const isGuestUser = (userId) => parseInt(userId, 10) === 0;
 
 // Generic error message for guest users attempting to access restricted actions
 const guestErrorMessage = { error: "Guest users don't have permission for this action" };
 
-
-// Assuming this is in ticketController.js
 exports.createTicket = (req, res) => {
-    const { userId, subject, description } = req.body; // Ensure these names match your request body
+    const { userId, subject, description } = req.body;
     ticketModel.createTicket(userId, subject, description, (err, ticketId) => {
         if (err) {
             res.statusCode = 500;

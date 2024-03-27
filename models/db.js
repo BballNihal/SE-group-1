@@ -1,8 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Define the path to your database file
-// Since db.js and customerService.db are in the same directory, use __dirname to refer to the current directory
 const dbPath = path.join(__dirname, 'customerService.db');
 
 // Establish a connection to the SQLite database
