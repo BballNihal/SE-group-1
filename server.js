@@ -49,8 +49,9 @@ const server = http.createServer((req, res) => {
             const ticketId = path.split('/')[3]; // Extracting ticket ID from the URL
             // Assuming you have a function in your ticketController for closing a ticket
             ticketController.openTicket({ params: { ticketId } }, res);
-        }
-        else {
+        }else if (path.startsWith('/tickets/faqs') && method === 'GET') {
+            ticketController.getFAQs(req, res);
+        }else {
             res.statusCode = 404;
             res.end(JSON.stringify({ message: "Route not found." }));
         }

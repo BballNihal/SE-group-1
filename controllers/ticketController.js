@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const ticketModel = require('../models/ticket');
 
 // Assuming this is in ticketController.js
@@ -85,5 +87,21 @@ exports.reopenTicket = (data, res) => {
             res.writeHead(200);
             res.end(JSON.stringify({ message: 'Ticket reopened successfully' }));
         }
+    });
+};
+
+exports.getFAQs = (req, res) => {
+    const faqFilePath = path.join(__dirname, '..', 'scraped_faq.txt'); // Adjust the path as necessary
+
+    fs.readFile(faqFilePath, { encoding: 'utf-8' }, (err, data) => {
+        if (err) {
+            console.error("Error reading FAQ file:", err);
+            res.writeHead(500);
+            res.end(JSON.stringify({ error: 'Failed to read FAQ file' }));
+            return;
+        }
+        
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end(data);
     });
 };
