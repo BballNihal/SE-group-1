@@ -1,4 +1,4 @@
-
+//configuration file for the server information
 const config = {
     db:{
         host: "localhost",

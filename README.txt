@@ -1,5 +1,6 @@
-*The SQL code to initizalize the database is here:
+*The SQL code to initizalize the database is here(included in setup.sql):
 (use carefully, it will delete the previous data)
+(This is a temporary database for this branch waiting to be normalized with others)
 
 cartCREATE DATABASE IF NOT EXISTS SHOP;
 USE SHOP;
@@ -40,7 +41,7 @@ id BIGINT NOT NULL AUTO_INCREMENT,
 PRIMARY KEY (id)
 ) DEFAULT CHARSET=utf8;
 ____________________________
-*Edit config to change the server login info
+*Edit config to change the server login informations (host, password, etc)
 ____________________________
 example of added product:
 INSERT INTO products(nameVar,descriptionVar,manufacturer,price,premiumStatus,availability,productID) VALUES("GASOLINE","gas for your truck","Gasco",278.2,1,1,"P1234567890123456");

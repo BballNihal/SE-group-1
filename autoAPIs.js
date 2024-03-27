@@ -1,29 +1,20 @@
 // web server module, loaded using "require" -- waits for HTTP requests from clients
 const http = require("http");
-/*const iCalendar = require('./iCalendar.js');
+const iCalendar = require('./iCalendar.js');
 const dateMaker = require('./dateMaker.js');
 const weekendOrHoliday = require('./weekendOrHoliday.js');
-*/const connectToDatabase = require('./connectToDatabase.js');
-//const addEventSingle = require('./addEventSingle.js');
-/*const cancelSingle = require('./cancelSingle.js');
+const connectToDatabase = require('./connectToDatabase.js');
+const addEventSingle = require('./addEventSingle.js');
+const cancelSingle = require('./cancelSingle.js');
 const lookupSingle = require('./lookupSingle.js');
-*/const addItem = require('./cart/addItem.js');
+const addItem = require('./cart/addItem.js');
 const removeItem = require('./cart/removeItem.js');
 const update = require('./cart/update.js');
 const retrieveItems = require('./cart/retrieveItems.js');
 const clearCart = require('./cart/clearCart.js');
-
-const createAppointment = require('./cart/createAppointment.js');
-const removeAppointment = require('./cart/removeAppointment.js');
-const viewAppointment = require('./cart/viewAppointment.js');
-const search = require('./cart/search.js');
 const sum = require('./cart/sum.js');
-
-const listOrders = require('./cart/listOrders.js');
-const listOrderDetails = require('./cart/listOrderDetails.js');
-const placeOrder = require('./cart/placeOrder.js');
-const cancelOrder = require('./cart/cancelOrder.js');
-const browse = require('./cart/Browse.js');
+const search = require('./search/searchItem.js');
+const search = require('./search/browse/browseItem.js');
 const querystr = require('querystring');
 
 var sql = require("mysql2");
@@ -38,18 +29,10 @@ const regExpRemove = new RegExp('^\/cart\/remove.*');
 const regExpUpdate = new RegExp('^\/cart\/update.*');
 const regExpClear = new RegExp('^\/cart\/clear.*');
 const regExpSum = new RegExp('^\/cart\/sum.*');
-
-const regExpCreateAppointment = new RegExp('^\/appointment\/add.*');
-const regExpRemoveAppointment = new RegExp('^\/appointment\/cancel.*');
-const regExpViewAppointment = new RegExp('^\/appointment\/view.*');
 const regExpRetrieveItems = new RegExp('^\/cart\/items.*');
-const regExpSearch = new RegExp('^\/search.*');
+const regExpSearchItem = new RegExp('^\/search\/search.*');
+const regExpBrowseItem = new RegExp('^\/search\/browse\/browse.*');
 
-const regExpBrowse = new RegExp('^\/search\/browse.*');
-const regExpListOrders = new RegExp('^\/orders\/list.*');
-const regExpPlaceOrder = new RegExp('^\/order\/add.*');
-const regExpListOrderDetails = new RegExp('^\/order\/details.*');
-const regExpCancelOrder = new RegExp('^\/order\/cancel.*');
 function setHeader(resMsg){
   if (!resMsg.headers || resMsg.headers === null) {
       resMsg.headers = {};
@@ -76,40 +59,12 @@ function applicationServer(request, response) {
 
     
       try {
-        if (regExpSearch.test(request.url)) {
-          resMsg = search(request, response);
-          done = true;
-          
-        }
-        if (regExpListOrderDetails.test(request.url)) {
-          resMsg = listOrderDetails(request, response);
-          done = true;
-          
-        }
-        if (regExpListOrders.test(request.url)) {
-          resMsg = listOrders(request, response);
-          done = true;
-          
-        }
-        if (regExpBrowse.test(request.url)) {
-          resMsg = browse(request, response);
-          done = true;
-          
-        }
-        if (regExpViewAppointment.test(request.url)) {
-          resMsg = viewAppointment(request, response);
-          done = true;
-          
-        }
-        if (regExpSum.test(request.url)) {
-          resMsg = sum(request, response);
-          done = true;
-          
-        }
-        if (regExpRetrieveItems.test(request.url)) {
-          resMsg = retrieveItems(request, response);
-          done = true;
-          
+
+        if (regExpSearchItem.test(request.url)) { 
+          resMsg = searchItem(request, response);
+        } 
+        else if (regExpBrowseItem.test(request.url)) {
+          resMsg = browseItem(request, response);
         }
       }
       catch(ex) { 
@@ -120,30 +75,15 @@ function applicationServer(request, response) {
    
    
     try {
- 
+      if (regExpAdd.test(request.url)) {
+        resMsg = addEventSingle(request, response);
+        //console.log("resMsg: "+resMsg);
+        done = true;
+        
+      }
       if (regExpAddToCart.test(request.url)) {
         console.log("adding");
         resMsg = addItem(request, response);
-        done = true;
-        
-      }
-      if (regExpRemoveAppointment.test(request.url)) {
-        resMsg = removeAppointment(request, response);
-        done = true;
-        
-      }
-      if (regExpPlaceOrder.test(request.url)) {
-        resMsg = placeOrder(request, response);
-        done = true;
-        
-      }
-      if (regExpCancelOrder.test(request.url)) {
-        resMsg = cancelOrder(request, response);
-        done = true;
-        
-      }
-      if (regExpCreateAppointment.test(request.url)) {
-        resMsg = createAppointment(request, response);
         done = true;
         
       }
@@ -160,6 +100,17 @@ function applicationServer(request, response) {
       }
       if (regExpClear.test(request.url)) {
         resMsg = clearCart(request, response);
+        done = true;
+        
+      }
+      if (regExpSum.test(request.url)) {
+        resMsg = sum(request, response);
+        done = true;
+        
+      }
+      if (regExpRetrieveItems.test(request.url)) {
+        console.log("trs");
+        resMsg = retrieveItems(request, response);
         done = true;
         
       }
