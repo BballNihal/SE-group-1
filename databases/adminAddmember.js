@@ -3,8 +3,8 @@ const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
 const stringHash = require('./passwordHash.js');
 
-function adminAddMember(req, res, body, lastMemberID, memberdb) {
-    const member = JSON.parse(body);
+function adminAddMember(req, res, member, lastMemberID, memberdb) {
+    //const member = JSON.parse(body);
 
     // Validation code
     const requiredProperties = ['username', 'password', 'phoneNumber', 'adminStatus'];
