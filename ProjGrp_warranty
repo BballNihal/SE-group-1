@@ -1,0 +1,141 @@
+const http = require('http');
+const url = require('url');
+const sqlite3 = require('sqlite3').verbose();
+
+let db = new sqlite3.Database('./memberServicesData.db');
+let lastEntryID = 0;
+
+const server = http.createServer((req, res) => {
+  const reqUrl = url.parse(req.url, true);
+  const path = reqUrl.pathname;
+  const method = req.method;
+
+  if (method === 'POST' && (path === '/discount' || path === '/warranty')) {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      const entry = JSON.parse(body);
+
+      // Validation code
+      const requiredProperties = ['name', 'description', 'duration'];
+      if (path === '/discount') {
+        requiredProperties.push('discountPercentage');
+      }
+      for (let prop of requiredProperties) {
+        if (!entry.hasOwnProperty(prop)) {
+          res.writeHead(400, {'Content-Type': 'text/plain'});
+          res.end(`Missing required property: ${prop}`);
+          return;
+        }
+      }
+
+      // Additional validation for duration, percentage, etc. can be added
+
+      if (lastEntryID >= 99999) {
+        res.writeHead(500, {'Content-Type': 'text/plain'});
+        res.end('No more entry IDs available');
+        return;
+      }
+
+      lastEntryID++;
+      entry.entryID = path === '/discount' ? 'D' + String(lastEntryID).padStart(5, '0') : 'W' + String(lastEntryID).padStart(5, '0');
+
+      const tableName = path === '/discount' ? 'discounts' : 'warranties';
+      const columns = path === '/discount' ? ['entryID', 'name', 'description', 'duration', 'discountPercentage'] : ['entryID', 'name', 'description', 'duration'];
+      const values = columns.map(col => entry[col]);
+
+      db.run(`INSERT INTO ${tableName} VALUES (${columns.map(() => '?').join(', ')})`, values, function(err) {
+        if (err) {
+          res.writeHead(500, {'Content-Type': 'text/plain'});
+          res.end('Database error');
+        } else {
+          res.end(`Entry registered successfully. Your entry ID is ${entry.entryID}`);
+        }
+      });
+    });
+  } else if (method === 'PUT' && (path.startsWith('/discount/') || path.startsWith('/warranty/'))) {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      const entry = JSON.parse(body);
+      const entryID = path.split('/')[2];
+      const tableName = path.startsWith('/discount/') ? 'discounts' : 'warranties';
+      const columns = path.startsWith('/discount/') ? ['name', 'description', 'duration', 'discountPercentage'] : ['name', 'description', 'duration'];
+      const updateParams = columns.map(col => entry[col]);
+
+      db.run(`UPDATE ${tableName} SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE entryID = ?`, [...updateParams, entryID], function(err) {
+        if (err) {
+          res.writeHead(500, {'Content-Type': 'text/plain'});
+          res.end('Database error');
+        } else {
+          res.end(`Entry updated successfully. Your entry ID is ${entryID}`);
+        }
+      });
+    });
+  } else if (method === 'DELETE' && (path.startsWith('/discount/') || path.startsWith('/warranty/'))) {
+    const entryID = path.split('/')[2];
+
+    const tableName = path.startsWith('/discount/') ? 'discounts' : 'warranties';
+    
+    db.run(`DELETE FROM ${tableName} WHERE entryID = ?`, entryID, function(err) {
+      if (err) {
+        res.writeHead(500, {'Content-Type': 'text/plain'});
+        res.end('Database error');
+      } else {
+        res.end(`Entry deleted successfully. Your entry ID was ${entryID}`);
+      }
+    });
+  } else {
+    res.statusCode = 404;
+    res.end('Not Found');
+  }
+});
+
+db.serialize(() => {
+  db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='discounts'`, (err, row) => {
+    if (!row) {
+      db.run(`CREATE TABLE discounts (entryID TEXT, name TEXT, description TEXT, duration INTEGER, discountPercentage REAL)`, (err) => {
+        if (err) {
+          console.error('Failed to create discounts table:', err);
+          return;
+        }
+        console.log('Discounts table created successfully.');
+      });
+    }
+  });
+
+  db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='warranties'`, (err, row) => {
+    if (!row) {
+      db.run(`CREATE TABLE warranties (entryID TEXT, name TEXT, description TEXT, duration INTEGER)`, (err) => {
+        if (err) {
+          console.error('Failed to create warranties table:', err);
+          return;
+        }
+        console.log('Warranties table created successfully.');
+      });
+    }
+  });
+
+  db.get(`SELECT entryID FROM discounts ORDER BY entryID DESC LIMIT 1`, (err, row) => {
+    if (row) {
+      lastEntryID = parseInt(row.entryID.substring(1));
+    }
+  });
+
+  db.get(`SELECT entryID FROM warranties ORDER BY entryID DESC LIMIT 1`, (err, row) => {
+    if (row) {
+      const id = parseInt(row.entryID.substring(1));
+      lastEntryID = Math.max(lastEntryID, id);
+    }
+  });
+});
+
+server.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
+
+module.exports = server;
