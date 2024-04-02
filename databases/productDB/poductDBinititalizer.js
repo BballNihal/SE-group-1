@@ -1,10 +1,15 @@
+/*
+This code will create the products database
+This code will verify all data in products.txt and add it to the database
+
+AUTHOR: NIHAL ABUDL MUNEER
+*/
+
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 
-// Read the products from the file
 const products = JSON.parse(fs.readFileSync('databases/productDB/products.txt', 'utf8'));
 
-// Create a new database (or open it if it already exists)
 let db = new sqlite3.Database('databases/productDB/products.db', (err) => {
   if (err) {
     console.error(err.message);
@@ -12,7 +17,6 @@ let db = new sqlite3.Database('databases/productDB/products.db', (err) => {
   console.log('Connected to the products database.');
 });
 
-// Create a new table for the products
 db.run(`CREATE TABLE products (
     productID TEXT PRIMARY KEY,
     productType TEXT,
@@ -21,14 +25,14 @@ db.run(`CREATE TABLE products (
     quantity INT
 )`, (err) => {
   if (err) {
-    // Table already created
+    //this means the table already exist so do nothing
   } else {
-    // Table just created, creating some rows
+    // create rows
     let insert = 'INSERT INTO products (productID, productType, name, price, quantity) VALUES (?, ?, ?, ?, ?)';
     let validProductTypes = ["Bumpers", "Suspension", "BrakePads", "Clutches", "Engine", "Catalyst", "Downpipes", "Wheels", "InteriorTrim", "Tires"];
     products.forEach(product => {
       // Validate the product data
-      if (!/^P\d{5}$/.test(product.productID)) {
+      if (!/^P\d{16}$/.test(product.productID)) {
         console.log(`Product ${product.productID} not added: Invalid productID format.`);
         return;
       }
@@ -36,7 +40,7 @@ db.run(`CREATE TABLE products (
         console.log(`Product ${product.productID} not added: Invalid productType.`);
         return;
       }
-      // Remove commas from the price and validate the format
+      // validate the format
       let price = product.price.replace(/,/g, '');
       if (!/^\$\d+(\.\d+)?$/.test(price)) {
         console.log(`Product ${product.productID} not added: Invalid price format.`);

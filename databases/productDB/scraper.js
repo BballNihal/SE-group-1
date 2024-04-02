@@ -77,7 +77,7 @@ async function scrapeProductData() {
                 pIDnum++;
                 let name = await productNames[j].getText();
                 let price = await productPrices[j].getText();
-                let pID = `P${String(pIDnum).padStart(5, '0')}`;
+                let pID = `P${String(pIDnum).padStart(16, '0')}`;
                 
                 //Creates a realistic random number for quantity in stock depeding on the product type
                 //Should be noted that the quntity is relatively low since all these products are very high end and not normally mass produced
@@ -171,7 +171,7 @@ async function scrapeProductData() {
             pIDnum++;
             let name = await tireProductNames[j].getText();
             let price = await tireProductPrices[j].getText();
-            let pID = `P${String(pIDnum).padStart(5, '0')}`;
+            let pID = `P${String(pIDnum).padStart(16, '0')}`;
             
             //formatting 
             name = name.replace(/\n/g, ' ');
