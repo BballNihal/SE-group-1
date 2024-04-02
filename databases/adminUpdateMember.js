@@ -2,8 +2,8 @@ const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
 const stringHash = require('./passwordHash.js');
-function adminUpdateMember(req, res, body, memberdb) {
-    const member = JSON.parse(body);
+function adminUpdateMember(req, res, member, memberdb) {
+   // const member = JSON.parse(body);
 
     // Validation code
     const requiredProperties = ['memberID', 'username', 'password', 'phoneNumber', 'adminStatus'];
