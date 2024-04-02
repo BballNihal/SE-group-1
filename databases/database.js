@@ -15,9 +15,12 @@ const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
 const stringHash = require('./passwordHash.js');
+
 const adminAddMember = require('./adminAddmember.js');
 const adminUpdateMember = require('./adminUpdateMember.js');
 const adminDeleteMember = require('./adminDeleteMember.js');
+
+
 let memberdb = new sqlite3.Database('./memberData.db');
 let discountdb = new sqlite3.Database('./discountData.db');
 let transactiondb = new sqlite3.Database('./transactionData.db');
@@ -39,26 +42,26 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
 
-        // try {
-        //     var requestData = JSON.parse(body);
-        // } catch (error){
-        //     res.writeHead(400, { 'Content-Type': 'text/plain' });
-        //     res.end(`Error parsing: ${error}`);
-        //     return;
-        // }
+         try {
+             var requestData = JSON.parse(body);
+         } catch (error){
+             res.writeHead(400, { 'Content-Type': 'text/plain' });
+             res.end(`Error parsing: ${error}`);
+             return;
+         }
 
         switch (`${method} ${path}`) {
 
             case 'POST /member':
-                lastMemberID = adminAddMember(req, res, body, lastMemberID, memberdb);
+                lastMemberID = adminAddMember(req, res, requestData, lastMemberID, memberdb);
                 break;
             
             case 'PUT /member':
-                adminUpdateMember(req, res, body, memberdb);
+                adminUpdateMember(req, res, requestData, memberdb);
                 break;
             
             case 'DELETE /member':
-                adminDeleteMember(req, res, body, memberdb);
+                adminDeleteMember(req, res, requestData, memberdb);
                 break;
 
             case 'POST /discount':
