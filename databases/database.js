@@ -20,6 +20,13 @@ const adminAddMember = require('./adminAddmember.js');
 const adminUpdateMember = require('./adminUpdateMember.js');
 const adminDeleteMember = require('./adminDeleteMember.js');
 
+const adminAddDiscount = require('./adminAddDiscount.js');
+const adminUpdateDiscount = require('./adminUpdateDiscount.js');
+const adminDeleteDiscount = require('./adminDeleteDiscount.js');
+
+const adminAddTransaction = require('./adminAddTransaction.js');
+const adminUpdateTransaction = require('./adminUpdateTransaction.js');
+const adminDeleteTransction = require ('./adminDeleteTransaction.js');
 
 let memberdb = new sqlite3.Database('./memberData.db');
 let discountdb = new sqlite3.Database('./discountData.db');
@@ -66,150 +73,50 @@ const server = http.createServer((req, res) => {
 
             case 'POST /discount':
                 
-                //data validation 
-                const requiredDiscountProperties = ['productId', 'discountCode', 'discountAmount'];
-                for (let prop of requiredDiscountProperties) {
-                    if (!requestData.hasOwnProperty(prop)) {
-                        res.writeHead(400, { 'Content-Type': 'text/plain' });
-                        res.end(`Missing required property: ${prop}`);
-                        return;
-                    }
-                }
-
-                //checking for empty IDs
-                for(let i = 0; i < requiredDiscountProperties.length;i++){
-                    let property = requiredDiscountProperties[i];
-                    if(requestData[property].length === 0){
-                        res.writeHead(400, { 'Content-Type': 'text/plain' });
-                        res.end(`Error : Missing ${property} `);
-                        return;
-                    }
-                }
-
-
-                //inserting discounts inot the discount database
-                discountdb.run(`INSERT INTO discount VALUES (?,?,?)`, [requestData.productId,requestData.discountCode,requestData.discountAmount], function(err){
-
-                    if(err){
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Discount Database error: ${err} `);
-                    }else {
-                        res.end(`Discount sucessfully added `);
-                    }
-
-                });//end of database insert
+                adminAddDiscount(res,requestData,discountdb);
 
                 break; //end of case post /discount
 
             case 'PUT /discount':
                 
-                //updating discount database
-                discountdb.run(`UPDATE discount SET discountCode = ?, discountAmount = ? WHERE productId = ?`, [requestData.discountCode,requestData.discountAmount,requestData.productId], function (err){
-                    if(err){
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Discount Database error: ${err} `);
-                    } else if (this.changes === 0){
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Discount Database error: No matching productId in database `);
-                    }
-                    else {
-                        res.end(`Discount sucessfully updated `);
-
-                    }
-
-                });//end of database update
+                adminUpdateDiscount(res,requestData,discountdb);
 
                 break;//end of case put /discount
 
             case 'DELETE /discount':
 
-                discountdb.run(`DELETE FROM discount WHERE productId = ?`, requestData.productId,function(err){
-                    if(err){
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Discount Database error: ${err} `);
-                    }else {
-                        res.end(`Discount sucessfully deleted `);
-
-                    }
-                }); //end of database delete
+                adminDeleteDiscount(res,requestData,discountdb);
                 
                 break;//end of case delete /discount
-
 
 
 
             //Transaction Database Request
             case 'POST /transaction':
 
-                //data validation 
-                const requiredTransactionProperties = ['orderId','productId', 'deliveryStatus'];
-                for (let prop of requiredTransactionProperties) {
-                    if (!requestData.hasOwnProperty(prop)) {
-                        res.writeHead(400, { 'Content-Type': 'text/plain' });
-                        res.end(`Missing required property: ${prop}`);
-                        return;
-                    }
-                }
-
-                //checking for empty IDs
-                for (let i = 0; i < requiredTransactionProperties.length; i++) {
-                    let property = requiredTransactionProperties[i];
-                    if (requestData[property].length === 0) {
-                        res.writeHead(400, { 'Content-Type': 'text/plain' });
-                        res.end(`Error : Missing ${property} `);
-                        return;
-                    }
-                }
-
-                //inserting transaction into the transaction database
-                transactiondb.run(`INSERT INTO transactions VALUES (?,?,?)`, [requestData.orderId, requestData.productId, requestData.deliveryStatus], function (err) {
-
-                    if (err) {
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Transaction Database error: ${err} `);
-                    } else {
-                        res.end(`transaction sucessfully added `);
-                    }
-
-                });//end of database insert
+                adminAddTransaction(res,requestData,transactiondb);
 
 
                 break;//end of case post /transaction
 
             case 'PUT /transaction':
 
-                //updating transaction database
-                transactiondb.run(`UPDATE transactions SET deliveryStatus = ?, productId = ? WHERE orderId = ?`, [requestData.deliveryStatus, requestData.productId, requestData.orderId], function (err) {
-                    if (err) {
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Transaction Database error: ${err} `);
-                    } else if (this.changes === 0) {
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Transaction Database error: No matching orderID in database `);
-                    }
-                    else {
-                        res.end(`Transaction sucessfully updated `);
-
-                    }
-
-                });//end of database update
-
+                adminUpdateTransaction(res,requestData,transactiondb);
 
                 break;//end of case put /transaction
 
             case 'DELETE /transaction':
 
-                transactiondb.run(`DELETE FROM transactions WHERE orderId = ?`, requestData.orderId, function (err) {
-                    if (err) {
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
-                        res.end(`Transaction Database error: ${err} `);
-                    } else {
-                        res.end(`Transaction sucessfully deleted `);
-
-                    }
-                }); //end of database delete
+                adminDeleteTransction(res,requestData,transactiondb);
 
                 break;//end of case delete /transaction
+
+            default:
+
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end(`Error: Not Found `);
+
+            break;
 
 
         }//end of switch case
