@@ -3,8 +3,8 @@ const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
 const stringHash = require('./passwordHash.js');
 
-function adminDeleteMember(req, res, body, memberdb) {
-    const member = JSON.parse(body);
+function adminDeleteMember(req, res, member, memberdb) {
+    //const member = JSON.parse(body);
     const memberID = member.memberID;
 
     memberdb.run(`DELETE FROM members WHERE memberID = ?`, memberID, function (err) {
