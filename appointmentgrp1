@@ -1,0 +1,112 @@
+const http = require('http');
+const url = require('url');
+const sqlite3 = require('sqlite3').verbose();
+
+let db = new sqlite3.Database('./appointments.db');
+let lastEntryID = 0;
+
+const server = http.createServer((req, res) => {
+  const reqUrl = url.parse(req.url, true);
+  const path = reqUrl.pathname;
+  const method = req.method;
+
+  if (method === 'POST' && path === '/appointment') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      const entry = JSON.parse(body);
+
+      // Validation code
+      const requiredProperties = ['memberID', 'dateTime', 'serviceType'];
+      for (let prop of requiredProperties) {
+        if (!entry.hasOwnProperty(prop)) {
+          res.writeHead(400, {'Content-Type': 'text/plain'});
+          res.end(`Missing required property: ${prop}`);
+          return;
+        }
+      }
+
+      if (lastEntryID >= 99999) {
+        res.writeHead(500, {'Content-Type': 'text/plain'});
+        res.end('No more entry IDs available');
+        return;
+      }
+
+      lastEntryID++;
+      entry.entryID = 'A' + String(lastEntryID).padStart(5, '0');
+
+      const insertQuery = `INSERT INTO appointments (entryID, memberID, dateTime, serviceType) VALUES (?, ?, ?, ?)`;
+      db.run(insertQuery, [entry.entryID, entry.memberID, entry.dateTime, entry.serviceType], function(err) {
+        if (err) {
+          res.writeHead(500, {'Content-Type': 'text/plain'});
+          res.end('Database error');
+        } else {
+          res.end(`Appointment created successfully. Your appointment ID is ${entry.entryID}`);
+        }
+      });
+    });
+  } else if (method === 'PUT' && path.startsWith('/appointment/')) {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      const entry = JSON.parse(body);
+      const entryID = path.split('/')[2];
+
+      const updateQuery = `UPDATE appointments SET memberID = ?, dateTime = ?, serviceType = ? WHERE entryID = ?`;
+      db.run(updateQuery, [entry.memberID, entry.dateTime, entry.serviceType, entryID], function(err) {
+        if (err) {
+          res.writeHead(500, {'Content-Type': 'text/plain'});
+          res.end('Database error');
+        } else {
+          res.end(`Appointment updated successfully. Your appointment ID is ${entryID}`);
+        }
+      });
+    });
+  } else if (method === 'DELETE' && path.startsWith('/appointment/')) {
+    const entryID = path.split('/')[2];
+    const deleteQuery = `DELETE FROM appointments WHERE entryID = ?`;
+
+    db.run(deleteQuery, entryID, function(err) {
+      if (err) {
+        res.writeHead(500, {'Content-Type': 'text/plain'});
+        res.end('Database error');
+      } else {
+        res.end(`Appointment deleted successfully. Your appointment ID was ${entryID}`);
+      }
+    });
+  } else {
+    res.statusCode = 404;
+    res.end('Not Found');
+  }
+});
+
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS appointments (
+      entryID TEXT PRIMARY KEY,
+      memberID TEXT,
+      dateTime TEXT,
+      serviceType TEXT
+  )`, (err) => {
+    if (err) {
+      console.error('Failed to create appointments table:', err);
+      return;
+    }
+    console.log('Appointments table created successfully.');
+  });
+
+  db.get(`SELECT entryID FROM appointments ORDER BY entryID DESC LIMIT 1`, (err, row) => {
+    if (row) {
+      lastEntryID = parseInt(row.entryID.substring(1));
+    }
+  });
+});
+
+server.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
+
+module.exports = server;

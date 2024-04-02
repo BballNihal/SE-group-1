@@ -7,17 +7,44 @@ const url = require('url');
 const { OAuth2Client } = require('google-auth-library');
 const sqlite3 = require('sqlite3').verbose();
 const axios = require('axios');
-const {setUsername, getUsername,clearUser} = require('./globalVar');
+const {setUsername, getUsername, clearUser} = require('./globalVar');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+
 
 const client = new OAuth2Client('565011930264-ktu1iofamjrl4tt7eudf2grpmjtb8nmk.apps.googleusercontent.com');
 let db = new sqlite3.Database('./memberData.db');
 let lastMemberID = 0;
+
+async function hashPassword(password) {
+    const saltRounds = 10; // Cost factor for bcrypt
+    return await bcrypt.hash(password, saltRounds);
+}
+async function comparePassword(password, hashedPassword) {
+    return await bcrypt.compare(password, hashedPassword);
+}
+
+function generateToken(username) {
+    const randomKey = generateRandomKey();
+  
+    const token = jwt.sign({ username: username, randomKey: randomKey }, 'secret_key', { expiresIn: '1h' });
+    return token;
+  }
+  
+  function generateRandomKey() {
+    const randomNumber = Math.floor(Math.random() * 1000000);
+    const randomKey = randomNumber.toString().padStart(6, '0');
+    return randomKey;
+  }
+
 
 const server = http.createServer(async(req, res) => {
   const reqUrl = url.parse(req.url, true);
   const path = reqUrl.pathname;
   const method = req.method;
 
+  //CALLBACK FOR GOOGLE
   //callback with google this is where we grab the user information after they sign in.
   if (path === '/auth/google/callback') {
     const token = reqUrl.query.token;
@@ -52,12 +79,14 @@ const server = http.createServer(async(req, res) => {
 }
 //where we call facebook to sign in. Currently my request is pending for verification once approved link should work.
 //will take you to the facebook page just not currently accessible yet.
+//PATH TO FACEBOOK
   else if(path === '/auth/facebook'){
     const redirectUrl = `https://www.facebook.com/v11.0/dialog/oauth?client_id=1452675045679886&redirect_uri=http://localhost:3000/auth/facebook/callback`;
     res.writeHead(302, { 'Location': redirectUrl });
     res.end();
     
   } //callback to the website after facebook login. This is where we can grab the information.  
+  //CALLBACK FROM FACEBOOK
   else if (path === '/auth/facebook/callback') {
         const code = reqUrl.query.code;
         if (code) {
@@ -80,7 +109,7 @@ const server = http.createServer(async(req, res) => {
             res.writeHead(400, {'Content-Type': 'text/plain'});
             res.end('Code is required');
         }
-    } 
+    } //CALL TO GOOGLE
   else if(method === 'GET' && path === '/auth/google'){
     // Redirect user to Google Sign-In page
     const redirectUrl = 'https://accounts.google.com/o/oauth2/v2/auth' +
@@ -108,8 +137,6 @@ const server = http.createServer(async(req, res) => {
           return;
         }
       }
-    
-
       const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
       if (!emailRegex.test(member.username)) {
         res.writeHead(400, {'Content-Type': 'text/plain'});
@@ -139,7 +166,8 @@ const server = http.createServer(async(req, res) => {
       lastMemberID++;
       member.memberID = 'M' + String(lastMemberID).padStart(10, '0');
 
-      db.run(`INSERT INTO members VALUES (?, ?, ?, ?, ?)`, [member.memberID, member.username, member.password, member.phoneNumber, member.adminStatus], function(err) {
+      hashPassword(member.password).then(hashedPassword => {
+        db.run(`INSERT INTO members VALUES (?, ?, ?, ?, ?)`, [member.memberID, member.username, hashedPassword, member.phoneNumber, member.adminStatus], function(err) {
         if (err) {
           res.writeHead(500, {'Content-Type': 'text/plain'});
           res.end('Database error');
@@ -148,7 +176,11 @@ const server = http.createServer(async(req, res) => {
           res.end(`Member registered successfully. Your member ID is ${member.memberID}`);
         }
       });
+    }).catch(err => {
+        res.writeHead(500, {'Content-Type': 'text/plain'});
+        res.end('Error hashing password');
     });
+});
   } else if (method === 'PUT' && path.startsWith('/member/')) {
     let body = '';
     req.on('data', chunk => {
@@ -206,7 +238,46 @@ const server = http.createServer(async(req, res) => {
             }  
         })
     })
-  } else {
+  } else if (method === 'POST' && path === '/member/login') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      const loginData = JSON.parse(body);
+      const { username, password } = loginData;
+  
+      db.get('SELECT * FROM members WHERE username = ?', [username], (err, row) => {
+        if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Database error');
+        } else {
+            if (row) {
+                // Compare hashed password
+                comparePassword(password, row.password).then(match => {
+                    if (match) {
+                        // Passwords match, proceed with login
+                        const token = generateToken(username);
+                        res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` });
+                        res.end(JSON.stringify({ message: 'Login successful', token: token }));
+                    } else {
+                        // Passwords don't match
+                        res.writeHead(401, { 'Content-Type': 'text/plain' });
+                        res.end('Invalid username or password');
+                    }
+                }).catch(err => {
+                    console.error('Error comparing passwords:', err);
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Error comparing passwords');
+                });
+            } else {
+                res.writeHead(401, { 'Content-Type': 'text/plain' });
+                res.end('Invalid username or password');
+            }
+        }
+    });
+});
+  }else {
     res.statusCode = 404;
     res.end('Not Found');
   }
@@ -236,3 +307,6 @@ server.listen(3000, () => {
   console.log('Server listening on port 3000');
 });
 module.exports = server;
+
+//authenticate to access database.
+//
