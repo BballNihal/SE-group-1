@@ -6,7 +6,10 @@ const verify = require('../verify.js');
 /*removes appointment (sets specification to cancelled)
 //currently works by time and memberID, could
 //be changed to work by appointment ID
+<<<<<<< HEAD
 (working)
+=======
+>>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 POST appointment/cancel
 format:
 {

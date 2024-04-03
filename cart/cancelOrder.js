@@ -21,7 +21,11 @@ function cancelOrder(request,response) {
          body = JSON.parse(prebody);
          for (i in body) {
             if (body[i] instanceof Object) {
+<<<<<<< HEAD
                sqlStatement = "UPDATE orders SET statusVar ='Canceled' WHERE orderID='"+body[i].orderID+"' AND statusVar ='pending';";
+=======
+               sqlStatement = "UPDATE orders SET status='cancelled' WHERE orderID='"+body[i].orderID+"' AND status='pending';";
+>>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
                console.log(sqlStatement);
                dBCon.query(sqlStatement, function (err, result) {
                   if (err) {

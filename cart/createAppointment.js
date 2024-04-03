@@ -4,7 +4,10 @@ const connectToDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
 
 /*creates member appointment
+<<<<<<< HEAD
 (working)
+=======
+>>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 POST appointment/add
 format:
 {

@@ -1,8 +1,17 @@
 {
+<<<<<<< HEAD
     "CART":{
     "cartID":"C1234567890",
     "memberID":"M1234567890",
     "productID":"P123456789012345",
     "quantity":123
+=======
+    "secondEvent":{
+    "attendee":"THOMAS",
+    "dtstart":"20240319T033408",
+    "dtstamp":"20240307T155621",
+    "method":"REQUEST",
+    "statusValue":"TENTATIVE"
+>>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
     }
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*create an empty cart to a user
 //generate cartid by encrytion of member id and current time
 POST cart/createCart
@@ -45,6 +46,36 @@ function createCart(request,response) {
         }
     }
     )
+=======
+// Description: This file is used to create a cart for a member.
+//input memberID
+//add cartID to cart table
+//output cartID
+
+const encryptionID = require('../encryptionID.js');
+const setHeader = require('../setHeader.js');
+const connectToDatabase = require('../connectToDatabase.js');
+
+function createCart(memberID) {
+    let resMsg = {};
+    var dBCon = connectToDatabase();
+    var cartID = encryptionID(10, memberID);
+    //add C to the beginning of the cartID
+    cartID = "C"+cartID;
+    var sqlStatement = "INSERT INTO cart(cartID, memberID) VALUES ('"+cartID+"','"+memberID+"');";
+    console.log(sqlStatement);
+    dBCon.query(sqlStatement, function (err, result) {
+        if (err) {
+            response.writeHead(resMsg.code=400, resMsg.hdrs);
+        } else {
+            response.writeHead(resMsg.code=201, resMsg.hdrs); 
+        }  
+        setHeader(resMsg);
+        response.end(resMsg.body);
+        dBCon.end();
+        return cartID;
+    });
+>>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 }
 
 module.exports = createCart;
