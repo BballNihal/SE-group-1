@@ -31,7 +31,7 @@ function adminAddDiscount(res,requestData,discountdb){
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end(`Discount Database error: ${err} `);
         } else {
-            res.end(`Discount ${requestData.discountCode} sucessfully added `);
+            res.end(`Discount for ${requestData.productId} sucessfully added `);
         }
 
     });//end of database insert
