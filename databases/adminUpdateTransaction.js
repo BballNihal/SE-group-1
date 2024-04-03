@@ -15,7 +15,7 @@ function adminUpdateTransaction (res,requestData,transactiondb){
             return;
         }
         else {
-            res.end(`Transaction sucessfully updated `);
+            res.end(`Transaction ${requestData.orderId} sucessfully updated `);
         }
 
     });//end of database update
