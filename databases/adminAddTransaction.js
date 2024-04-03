@@ -31,7 +31,7 @@ function adminAddTransaction(res,requestData,transactiondb){
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end(`Transaction Database error: ${err} `);
         } else {
-            res.end(`transaction sucessfully added `);
+            res.end(`Transaction sucessfully added : ${requestData.orderId} is the order Id `);
         }
 
     });//end of database insert
