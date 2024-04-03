@@ -1,5 +1,7 @@
 {
-    "Cancel":{
-        "confirmation_number":2683662
-    }
+   "Change":{
+    "cartID":"C1234567890",
+    "productID":"P1234567890123456",
+    "quantity":34
+   }
 }

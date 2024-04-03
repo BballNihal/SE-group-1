@@ -27,7 +27,7 @@ function cancelOrder(request,response) {
                   if (err) {
                         response.writeHead(resMsg.code=400, resMsg.hdrs);
                   }else{
-                        response.writeHead(resMsg.code=200, resMsg.hdrs); 
+                        response.writeHead(resMsg.code=201, resMsg.hdrs); 
                   }  
                   setHeader(resMsg);
                   response.end(resMsg.body);

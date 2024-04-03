@@ -17,9 +17,6 @@ test7=fs.readFileSync('./tests/test7.txt').toString();
 test8=fs.readFileSync('./tests/test8.txt').toString();
 test9=fs.readFileSync('./tests/test9.txt').toString();
 test10=fs.readFileSync('./tests/test10.txt').toString();
-test11=fs.readFileSync('./tests/test11.txt').toString();
-test12=fs.readFileSync('./tests/test12.txt').toString();
-test13=fs.readFileSync('./tests/test13.txt').toString();
 
 describe('API Tests', function() {
   it('test 1 - add to cart - valid', async () => {
@@ -42,7 +39,26 @@ describe('API Tests', function() {
     const res = (await request(sqlServer).post('/cart/add').send(test5).set('Content-Type','application/json'));
     expect(res.status).toBe(201);
   });
-
+  it('test 6 - update cart', async () => {
+    const res = (await request(sqlServer).post('/cart/update').send(test6).set('Content-Type','application/json'));
+    expect(res.status).toBe(201);
+  });
+  it('test 7 - clear cart', async () => {
+    const res = (await request(sqlServer).post('/cart/clear').send(test7).set('Content-Type','application/json'));
+    expect(res.status).toBe(201);
+  });
+  it('test 8 - place order', async () => {
+    const res = (await request(sqlServer).post('/order/add').send(test8).set('Content-Type','application/json'));
+    expect(res.status).toBe(201);
+  });
+  it('test 9 - place order (invalid)', async () => {
+    const res = (await request(sqlServer).post('/order/add').send(test9).set('Content-Type','application/json'));
+    expect(res.status).toBe(400);
+  });
+  it('test 10 - place order bad URI', async () => {
+    const res = (await request(sqlServer).post('/orde/add').send(test10).set('Content-Type','application/json'));
+    expect(res.status).toBe(404);
+  });
 
  
   

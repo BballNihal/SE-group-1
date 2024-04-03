@@ -24,16 +24,13 @@ function placeOrder(request,response) {
     var dBCon = connectToDatabase();
     var prebody='';
     var sqlStatement;
-    console.log("st");
     request.on('data', function(data){
         prebody+=data;
         body = JSON.parse(prebody);
-        console.log("st2");
         //generate order id by encrytion of cart id and current time
         var orderID = encrytionID(8,body.cartID);
         for (i in body) {
           if (body[i] instanceof Object) {
-            console.log("st3");
             if(verify("discountCode",body[i].discountCode) & verify("cart",body[i].cartID)&verify("string",body[i].paymentInfo)&!isNaN(body[i].price))  {
               sqlStatement = "INSERT INTO orders(cartID, paymentInfo, discountCode, price, orderID, memberID, statusVar)";
               sqlStatement+= "VALUES ('"+body[i].cartID+"','"+body[i].paymentInfo+"','"+body[i].discountCode+"',"+body[i].price+",'"+orderID+"','"+body[i].memberID+"', 'pending');";

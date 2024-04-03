@@ -1,6 +1,5 @@
 /*get all order ID's belonging to one member
 GET order/list
-(unfinished)
 format:
 {
    "ABC":{

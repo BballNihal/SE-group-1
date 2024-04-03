@@ -1,5 +1,5 @@
 {
-    "Cancel":{
-        "name":"JEFF"
-    }
+   "clear":{
+    "cartID":"C1234567890"
+   }
 }

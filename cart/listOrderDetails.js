@@ -1,7 +1,7 @@
 /*get order details belonging to one order
-(products ordered, order date, price, payment info)
+(price, cart ID, payment info)
 GET order/details
-(unfinished)
+
 format:
 {
    "ABC":{

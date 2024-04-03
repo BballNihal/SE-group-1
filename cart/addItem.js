@@ -2,7 +2,7 @@
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
-const verifyUserStatus = require("../verifyUserStatus.js");
+//const verifyUserStatus = require("../verifyUserStatus.js");
 
 
 /*adds item to a user's cart
@@ -12,7 +12,6 @@ format:
 {
    "ABC":{
     "cartID":"C1234567890",
-    "memberID":"M1234567890"
     "productID":"P1234567890123456",
     "quantity":123
    }
@@ -24,9 +23,6 @@ function addItem(request,response) {
     var dBCon = connectToDatabase();
     var prebody='';
     var sqlStatement;
-    //extra code
-
-    //end
 
     request.on('data', function(data){
         prebody+=data;
@@ -35,7 +31,7 @@ function addItem(request,response) {
        
       for (i in body) {
         if (body[i] instanceof Object) {
-          if(verify("cart",body[i].cartID) & verify("product",body[i].productID)&verify("quantity",body[i].quantity) & verifyUserStatus("member",body[i].memberID))  {
+          if(verify("cart",body[i].cartID) & verify("product",body[i].productID)&verify("quantity",body[i].quantity))  {
           sqlStatement = "INSERT INTO cart(cartID, productID, quantity)";
     sqlStatement+= "VALUES ('"+body[i].cartID+"','"+body[i].productID+"',"+body[i].quantity+");";
             console.log(sqlStatement);

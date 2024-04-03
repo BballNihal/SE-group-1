@@ -4,7 +4,6 @@ const connectToDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
 const searchFunction = require('../searchFunction.js');
 /*browse description of one product 
-(unfinished)
 GET search/browse (GET browse)
 format:
 {
@@ -16,7 +15,7 @@ format:
 const url = require('url');
 function isValidProductID(productID) {
     // Validate product ID format: Capital P followed by 16-digit number
-    const regex = /^P\d{15}$/;
+    const regex = /^P\d{16}$/;
     return true;//typeof productID === 'string' && regex.test(productID);
 }
 
@@ -25,9 +24,9 @@ function Browse(request, response) {
     
     // Extract productID from the request query parameters
     const parsedUrl = url.parse(request.url, true);
-    console.log(parsedUrl);
+   // console.log(parsedUrl);
     const productID = parsedUrl.pathname.substring(8,);//parsedUrl.query.productID;
-  console.log("b2"+productID);
+ // console.log("b2"+productID);
 
     // Validate product ID
     if (!isValidProductID(productID)) {

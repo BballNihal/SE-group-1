@@ -1,3 +1,6 @@
+Type "npm test" to test the code
+Edit config.js for server information
+
 The SQL code to initizalize the database is here:
 (use carefully, it will delete the previous data)
 
