@@ -17,7 +17,7 @@ function adminUpdateDiscount(res,requestData,discountdb){
             return;
         }
         else {
-            res.end(`Discount ${requestData.discountCode} sucessfully updated `);
+            res.end(`Discount for ${requestData.productId} sucessfully updated `);
         }
 
     });//end of database update
