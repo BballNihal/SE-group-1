@@ -26,11 +26,7 @@ function search(request,response) {
         if (body[i] instanceof Object) {
             if(2==2) {
                 sqlStatement = ""
-<<<<<<< HEAD
             sqlStatement = "SELECT nameVar, productType, price FROM products;";
-=======
-            sqlStatement = "SELECT nameVar, descriptionVar,manufacturer FROM products;";
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
      console.log(sqlStatement);
     dBCon.query(sqlStatement, function (err, result) {
         if (err) {

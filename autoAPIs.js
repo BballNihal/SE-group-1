@@ -10,25 +10,17 @@ const lookupSingle = require('./lookupSingle.js');
 */const addItem = require('./cart/addItem.js');
 const removeItem = require('./cart/removeItem.js');
 const update = require('./cart/update.js');
-<<<<<<< HEAD
 //const retrieveItems = require('./cart/retrieveItems.js');
-=======
-const retrieveItems = require('./cart/retrieveItems.js');
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 const clearCart = require('./cart/clearCart.js');
 
 const createAppointment = require('./cart/createAppointment.js');
 const removeAppointment = require('./cart/removeAppointment.js');
 const viewAppointment = require('./cart/viewAppointment.js');
 const search = require('./cart/search.js');
-<<<<<<< HEAD
 //const searchItem = require('./SearchFunction/Search/searchItem.js');
 //const sum = require('./cart/sum.js');
 
 const createCart = require('./cart/createCart.js');
-=======
-const sum = require('./cart/sum.js');
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 
 const listOrders = require('./cart/listOrders.js');
 const listOrderDetails = require('./cart/listOrderDetails.js');
@@ -50,24 +42,16 @@ const regExpUpdate = new RegExp('^\/cart\/update.*');
 const regExpClear = new RegExp('^\/cart\/clear.*');
 const regExpSum = new RegExp('^\/cart\/sum.*');
 
-<<<<<<< HEAD
 const regExpCreateCart = new RegExp('^\/cart\/createCart.*');
 
-=======
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 const regExpCreateAppointment = new RegExp('^\/appointment\/add.*');
 const regExpRemoveAppointment = new RegExp('^\/appointment\/cancel.*');
 const regExpViewAppointment = new RegExp('^\/appointment\/view.*');
 const regExpRetrieveItems = new RegExp('^\/cart\/items.*');
 const regExpSearch = new RegExp('^\/search.*');
 
-<<<<<<< HEAD
 const regExpBrowse = new RegExp('^\/browse.*');
 const regExpListOrders = new RegExp('^\/order\/list.*');
-=======
-const regExpBrowse = new RegExp('^\/search\/browse.*');
-const regExpListOrders = new RegExp('^\/orders\/list.*');
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 const regExpPlaceOrder = new RegExp('^\/order\/add.*');
 const regExpListOrderDetails = new RegExp('^\/order\/details.*');
 const regExpCancelOrder = new RegExp('^\/order\/cancel.*');
@@ -98,11 +82,7 @@ function applicationServer(request, response) {
     
       try {
         if (regExpSearch.test(request.url)) {
-<<<<<<< HEAD
           resMsg = searchItem(request, response);
-=======
-          resMsg = search(request, response);
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
           done = true;
           
         }
@@ -112,19 +92,13 @@ function applicationServer(request, response) {
           
         }
         if (regExpListOrders.test(request.url)) {
-<<<<<<< HEAD
           console.log("li");
-=======
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
           resMsg = listOrders(request, response);
           done = true;
           
         }
         if (regExpBrowse.test(request.url)) {
-<<<<<<< HEAD
           console.log("browsing");
-=======
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
           resMsg = browse(request, response);
           done = true;
           
@@ -135,10 +109,7 @@ function applicationServer(request, response) {
           
         }
         if (regExpSum.test(request.url)) {
-<<<<<<< HEAD
           console.log("sum");
-=======
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
           resMsg = sum(request, response);
           done = true;
           
@@ -158,14 +129,11 @@ function applicationServer(request, response) {
    
     try {
  
-<<<<<<< HEAD
       if (regExpCreateCart.test(request.url)) {
         resMsg = createCart(request, response);
         done = true;
         
       }
-=======
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
       if (regExpAddToCart.test(request.url)) {
         console.log("adding");
         resMsg = addItem(request, response);

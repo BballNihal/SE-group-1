@@ -2,12 +2,8 @@
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
 
-<<<<<<< HEAD
 /*clears a user's cart
 (working)
-=======
-/*clears a user's cart (NOT tested)
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 POST cart/clear
 format:
 {

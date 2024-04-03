@@ -1,10 +1,6 @@
 /*get all order ID's belonging to one member
 GET order/list
-<<<<<<< HEAD
 (unfinished)
-=======
-
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 format:
 {
    "ABC":{
@@ -35,7 +31,6 @@ function listOrders(request,response) {
                         response.writeHead(resMsg.code=200, resMsg.hdrs); 
                   }  
                   setHeader(resMsg);
-<<<<<<< HEAD
                   //response.end(JSON.stringify(result));
                   var i =0;
                   var r;
@@ -48,9 +43,6 @@ function listOrders(request,response) {
                   i++;
                   }
                   response.end(resMsg.body);
-=======
-                  response.end(JSON.stringify(result));
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
                   dBCon.end();
                   return resMsg.body;
                });

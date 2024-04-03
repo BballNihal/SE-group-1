@@ -12,10 +12,7 @@ of 5 (based on the feedback), the product id is 16 numbers
 */
 
 //todo: R, 1-100 number,password
-<<<<<<< HEAD
 console.log(verify("discountCode","2A3B4F"));
-=======
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 function verify(type,id){
 if (typeof id == "string") {
 if (type =="cart") {
@@ -70,13 +67,8 @@ if (type =="cart") {
     return false;
 } else if (type =="discountCode") {//a 6-digit discount code in hexadecimal
     if (id.length == 6) {
-<<<<<<< HEAD
         for (var i =0;i<6;i++) {
             if (!(!isNaN(id[i]) | id[i]=='A' | id[i]=='B' | id[i]=='C' | id[i]=='D' | id[i]=='E' | id[i]=='F' | id[i]=='a' | id[1]=='b' | id[i]=='c' | id[i]=='d' | id[i]=='e' | id[i]=='f' )) {
-=======
-        for (var i =0;i<=7;i++) {
-            if (!(!isNaN(id[i]) | id[i]=='A' | id[1]=='B' | id[i]=='C' | id[i]=='D' | id[i]=='E' | id[i]=='F')) {
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
                 return false;
             }
         }

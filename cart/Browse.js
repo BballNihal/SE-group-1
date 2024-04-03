@@ -5,11 +5,7 @@ const verify = require('../verify.js');
 const searchFunction = require('../searchFunction.js');
 /*browse description of one product 
 (unfinished)
-<<<<<<< HEAD
 GET search/browse (GET browse)
-=======
-GET search/browse
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 format:
 {
    "ABC":{
@@ -17,7 +13,6 @@ format:
 }
 }
 */
-<<<<<<< HEAD
 const url = require('url');
 function isValidProductID(productID) {
     // Validate product ID format: Capital P followed by 16-digit number
@@ -95,9 +90,6 @@ function Browse(request, response) {
 module.exports = Browse;
 
 /*
-=======
-
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
 function browse(request,response) {
     let resMsg = {};
     var dBCon = connectToDatabase();
@@ -133,8 +125,4 @@ function browse(request,response) {
     })
 }
 
-<<<<<<< HEAD
 module.exports = browse;*/
-=======
-module.exports = browse;
->>>>>>> 8555c4155ad262e9e8e515ae80091eed18fab276
