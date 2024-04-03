@@ -8,7 +8,7 @@ function adminDeleteTransaction(res,requestData,transactiondb){
             res.end(`Transaction Database error: ${err} `);
             return;
         } else {
-            res.end(`Transaction sucessfully deleted `);
+            res.end(`Transaction ${requestData.orderId} sucessfully deleted `);
 
         }
     }); //end of database delete
