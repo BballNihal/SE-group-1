@@ -19,9 +19,9 @@ const clearCart = require('./cart/clearCart.js');
 const createAppointment = require('./cart/createAppointment.js');
 const removeAppointment = require('./cart/removeAppointment.js');
 const viewAppointment = require('./cart/viewAppointment.js');
-const search = require('./cart/search.js');
-const searchItem = require('./search/searchItem.js');
-const browseItem = require('./search/browseItem.js');
+//const search = require('./cart/search.js');
+const searchItem = require('./SearchFunction/Search/searchItem.js');
+//const browseItem = require('./SearchFunction/browseItem.js');
 //const sum = require('./cart/sum.js');
 
 const createCart = require('./cart/createCart.js');
