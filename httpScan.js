@@ -6,11 +6,11 @@ var request = require('request');
 var HTMLParser = require('node-html-parser');
 const PdfParse = require('pdf-parse');
 const { JSDOM } = jsdom;
-const config = require('config');
+const config = require('./config.js');
 var output = "";
 //create a server object:(EDIT WITH CONFIG FILE)
-const hostName = config.get('server.hostName');
-const port = (process.env.PORT || config.get('server.port'));
+const hostName = config.server.hostName;
+const port = (process.env.PORT || config.server.port);
 const makeServer = http.createServer(function (req, res) {
   let body = [];
   body = Buffer.concat(body).toString();
