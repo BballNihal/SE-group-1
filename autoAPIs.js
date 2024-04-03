@@ -3,11 +3,13 @@ const http = require("http");
 /*const iCalendar = require('./iCalendar.js');
 const dateMaker = require('./dateMaker.js');
 const weekendOrHoliday = require('./weekendOrHoliday.js');
-*/const connectToDatabase = require('./connectToDatabase.js');
+*/
+const connectToDatabase = require('./connectToDatabase.js');
 //const addEventSingle = require('./addEventSingle.js');
 /*const cancelSingle = require('./cancelSingle.js');
 const lookupSingle = require('./lookupSingle.js');
-*/const addItem = require('./cart/addItem.js');
+*/
+const addItem = require('./cart/addItem.js');
 const removeItem = require('./cart/removeItem.js');
 const update = require('./cart/update.js');
 //const retrieveItems = require('./cart/retrieveItems.js');
@@ -17,7 +19,8 @@ const createAppointment = require('./cart/createAppointment.js');
 const removeAppointment = require('./cart/removeAppointment.js');
 const viewAppointment = require('./cart/viewAppointment.js');
 const search = require('./cart/search.js');
-//const searchItem = require('./SearchFunction/Search/searchItem.js');
+const searchItem = require('./search/searchItem.js');
+const browseItem = require('./search/browseItem.js');
 //const sum = require('./cart/sum.js');
 
 const createCart = require('./cart/createCart.js');

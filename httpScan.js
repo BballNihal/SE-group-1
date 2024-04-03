@@ -5,11 +5,13 @@ var http = require('http');
 var request = require('request');
 var HTMLParser = require('node-html-parser');
 const PdfParse = require('pdf-parse');
+const config = require('config');
 const { JSDOM } = jsdom;
 var output = "";
 //create a server object:
-const hostName = 'localhost';
-const port = (process.env.PORT || 8000);
+const hostName = config.get('server.hostName');//edit in config.js
+const port = (process.env.PORT || config.get('server.port'));//edit in config.js
+
 const makeServer = http.createServer(function (req, res) {
   let body = [];
   body = Buffer.concat(body).toString();
