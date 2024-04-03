@@ -1,5 +1,6 @@
 // web server module, loaded using "require" -- waits for HTTP requests from clients
 const http = require("http");
+const config = require('config');
 /*const iCalendar = require('./iCalendar.js');
 const dateMaker = require('./dateMaker.js');
 const weekendOrHoliday = require('./weekendOrHoliday.js');
@@ -35,7 +36,7 @@ const querystr = require('querystring');
 var sql = require("mysql2");
 const { Console } = require("console");
 
-const port = (process.env.PORT || 8000);
+const port = (process.env.PORT || config.get('server.port'));
 connectToDatabase();
 
 
