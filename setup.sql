@@ -26,6 +26,7 @@ CREATE TABLE appointments(
 memberID VARCHAR(100),
 time VARCHAR(100),
 Specification varchar(100),
+appointmentID VARCHAR(100) NOT NULL,
 id int PRIMARY KEY AUTO_INCREMENT
 );
 CREATE TABLE cart (
