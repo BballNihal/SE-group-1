@@ -3,6 +3,7 @@ const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
 const encrytionID = require('./encrytionID.js');
+//const sta = require('../idStandard.js');
 
 /*adds order
 POST order/add
@@ -27,8 +28,8 @@ function placeOrder(request,response) {
     request.on('data', function(data){
         prebody+=data;
         body = JSON.parse(prebody);
-        //generate order id by encrytion of cart id and current time
-        var orderID = encrytionID(8,body.cartID);
+        var orderID = 'O'+encrytionID(10, body[0].cartID, body[0].paymentInfo, body[0].discountCode, body[0].price, body[0].memberID);//generate order ID 10 characters long
+        // var orderID = sta.order.prefex+encrytionID(sta.order.length, body[0].cartID, body[0].paymentInfo, body[0].discountCode, body[0].price, body[0].memberID); //generate order ID 10 characters long
         for (i in body) {
           if (body[i] instanceof Object) {
             if(verify("discountCode",body[i].discountCode) & verify("cart",body[i].cartID)&verify("string",body[i].paymentInfo)&!isNaN(body[i].price))  {

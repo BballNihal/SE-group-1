@@ -3,7 +3,7 @@ const config = {
     db:{
         host: "localhost",
         user: "root",
-        database:"DB",
+        database:"CAL",
         password: "sql65536!#HYUJ"
     },
     server:{

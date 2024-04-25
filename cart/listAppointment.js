@@ -2,7 +2,7 @@ const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
 
-// /*get all appointment ID's belonging to one member
+// /*get all appointments belonging to one member
 // GET appointment/list
 // format:
 // {
@@ -23,7 +23,7 @@ function listAppointment(request,response) {
         for (i in body) {
             if (body[i] instanceof Object) {
                 if(verify("member",body[i].memberID))  {
-                    sqlStatement = "SELECT appointmentID FROM appointments WHERE memberID='"+body[i].memberID+"';";
+                    sqlStatement = "SELECT * FROM appointments WHERE memberID='"+body[i].memberID+"';";
                     console.log(sqlStatement);
                     dBCon.query(sqlStatement, function (err, result) {
                         if (err) {

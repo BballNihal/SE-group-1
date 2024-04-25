@@ -45,6 +45,11 @@ if (typeof id == "string") {
             return true;
         }
         return false;
+    }else if (type == "appointment") {
+        if (id[0]=="A" & id.length == 7 & !isNaN(id.substring(1,11))) {
+            return true;
+        }
+        return false;
     } else if (type =="member") {
         //Should member be distinct from cart? (since 
         //it doesn't seem to make sense for a member
@@ -96,11 +101,6 @@ if (typeof id == "string") {
             return false;
         }
         return true;
-    }else if (type == "appointment") {
-        if (id[0]=="A" & id.length == 11 & !isNaN(id.substring(1,11))) {
-            return true;
-        }
-        return false;
     }else{
         return false;
     }
