@@ -27,8 +27,10 @@ function removeItem(request,response) {
             console.log(sqlStatement);
     dBCon.query(sqlStatement, function (err, result) {
         if (err) {
+          console.log("400");
           response.writeHead(resMsg.code=400, resMsg.hdrs);
           }else{
+            console.log("201");
           response.writeHead(resMsg.code=201, resMsg.hdrs); 
         }  
         setHeader(resMsg);

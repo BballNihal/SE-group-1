@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Site</title>
+</head>
+<body>
+
+<h1>Enter item to remove from cart</h1>
+
+<input type="text" id="searchInput" placeholder="Search...">
+<button onclick="remover()">Remove</button>
+
+<div id="results"></div>
+
+<script>
+
+function remover() {
+
+    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+    if (searchTerm != ""){
+        document.getElementById("results").innerText = "Removed Item";
+        console.log("removing")
+        removeItemReq();
+    }
+
+    
+    
+        
+
+}
+function removeItemReq() {
+    console.log("1");
+    document.getElementById("results").innerText = "Removed Item2";
+    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+var theUrl = "/json-handler";
+xmlhttp.open("POST", theUrl);
+xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+xmlhttp.send(JSON.stringify({ "ABC":{
+   "cartID":"C1234567890",
+   "productID":"P1234567890"
+  }}));
+
+    xhr.send();
+    console.log("sent");
+}
+</script>
+
+</body>
+</html>
