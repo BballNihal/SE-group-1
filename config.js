@@ -9,6 +9,9 @@ const config = {
     server:{
         hostName: "localhost",
         port: 8000
+    },
+    sqliteDB: {
+        path: "./database.db"
     }
 };
 module.exports = config;

@@ -31,6 +31,7 @@ const browse = require('./cart/Browse.js');
 const querystr = require('querystring');
 
 var sql = require("mysql2");
+var sqlite3 = require('sqlite3').verbose();
 const { Console } = require("console");
 
 const port = (process.env.PORT || config.server.port);

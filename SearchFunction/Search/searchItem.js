@@ -1,6 +1,6 @@
 const url = require('url');
 const mysql = require('mysql2');
-
+const sql3 = require('sqlite3').verbose();
 
 function isValidSearchString(searchString) {
     // Validate search string: 2 - 50 characters

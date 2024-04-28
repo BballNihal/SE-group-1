@@ -15,3 +15,17 @@ function connectToDatabase() {
     return connection;
 }
 module.exports = connectToDatabase;
+// retrieve data from lite database file
+var sqlite3 = require('sqlite3').verbose();
+
+function connectToLiteDatabase() {
+    var db = new sqlite3.Database(config.sqliteDB.path, (err) => {
+        if (err) {
+            console.error(err.message);
+        }
+        console.log('Connected to the SQLite database.');
+    });
+    return db;
+}
+
+module.exports = connectToLiteDatabase;
