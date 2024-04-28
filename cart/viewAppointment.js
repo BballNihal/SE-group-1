@@ -48,5 +48,40 @@ function viewAppointment(request,response) {
     }
     })
 }
+function viewAppointmentLite(request, response) {
+    let resMsg = {};
+    var dBCon = connectToLiteDatabase();
+    var prebody = '';
+    var sqlStatement;
+    request.on('data', function(data) {
+        prebody += data;
+        body = JSON.parse(prebody);
+        for (i in body) {
+            if (body[i] instanceof Object) {
+                if (verify("member", body[i].memberID)) {
+                    sqlStatement = "SELECT * FROM appointments WHERE memberID='" + body[i].memberID + "';";
+                    console.log(sqlStatement);
+                    dBCon.all(sqlStatement, function(err, rows) {
+                        if (err) {
+                            console.log("error");
+                            response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                        } else {
+                            response.writeHead(resMsg.code = 200, resMsg.hdrs);
+                        }
+                        setHeader(resMsg);
+                        response.end(JSON.stringify(rows));
+                        dBCon.close();
+                        return resMsg.body;
+                    });
+                } else {
+                    response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                    setHeader(resMsg);
+                    response.end(resMsg.body);
+                    dBCon.close();
+                }
+            }
+        }
+    })
+}
 
-module.exports = viewAppointment;
+module.exports = viewAppointment, viewAppointmentLite;

@@ -16,4 +16,5 @@ ____________________________
 Use database from subgroup 1 or
 use databaseProducts.sql to initialize product database (test usage)
 ____________________________
-sqlite implementing***
+sqlite implementing*** implemented functions come with both mysql and sqlite version
+for example addItem() <-> addItemLite() can both be required from addItem.js

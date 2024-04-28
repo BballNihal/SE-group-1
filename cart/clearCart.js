@@ -40,6 +40,34 @@ function clearCart(request,response) {
     })
 }
 
+function clearCartLite(request,response) {
+  let resMsg = {};
+  var dBCon = connectToLiteDatabase();
+  var prebody='';
+  var sqlStatement;
+
+  request.on('data', function(data){
+      prebody+=data;
+      body = JSON.parse(prebody);
+      for (i in body) {
+          if (body[i] instanceof Object) {
+              sqlStatement = "DELETE FROM cart WHERE cartID = '"+ body[i].cartID+ "';";
+              console.log(sqlStatement);
+              dBCon.run(sqlStatement, function (err) { 
+                  if (err) {
+                      response.writeHead(resMsg.code=400, resMsg.hdrs);
+                  }else{
+                      response.writeHead(resMsg.code=201, resMsg.hdrs); 
+                  }  
+                  setHeader(resMsg);
+                  response.end(resMsg.body);
+                  dBCon.close(); 
+                  return resMsg.body;
+              });
+          }
+      }
+  })
+}
 
 class Item {
     constructor(name, price) {
@@ -47,4 +75,4 @@ class Item {
       this.price = price;
     }
   }
-module.exports = clearCart;
+module.exports = clearCart, clearCartLite;

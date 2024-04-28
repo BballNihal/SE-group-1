@@ -43,17 +43,40 @@ function removeItem(request,response) {
     })
 }
 
-function clearCart() {
+function removeItemLite(request, response) {
+  let resMsg = {};
+  var dBCon = connectToLiteDatabase();
+  var prebody = '';
+  var sqlStatement;
+  request.on('data', function(data) {
+      prebody += data;
+      body = JSON.parse(prebody);
+      for (i in body) {
+          if (body[i] instanceof Object) {
+              sqlStatement = "DELETE FROM cart WHERE cartID = '" + body[i].cartID + "' AND productID = '" + body[i].productID + "';";
+              console.log(sqlStatement);
+              dBCon.run(sqlStatement, function(err) {
+                  if (err) {
+                      console.log("400");
+                      response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                  } else {
+                      console.log("201");
+                      response.writeHead(resMsg.code = 201, resMsg.hdrs);
+                  }
+                  setHeader(resMsg);
+                  response.end(resMsg.body);
+                  dBCon.close();
+                  return resMsg.body;
+              });
+          }
+      }
+  })
+}
 
-}
-function calculateTotal() {
-    total = 0;
-    return total;
-}
 class Item {
     constructor(name, price) {
       this.name = name;
       this.price = price;
     }
   }
-module.exports = removeItem;
+module.exports = removeItem, removeItemLite;

@@ -56,4 +56,44 @@ function createAppointment(request,response) {
     })
 }
 
-module.exports = createAppointment;
+function createAppointmentLite(request, response) {
+    let resMsg = {};
+    let db = connectToLiteDatabase();
+    let prebody = '';
+    let sqlStatement;
+
+    request.on('data', function(data) {
+        prebody += data;
+        let body = JSON.parse(prebody);
+
+        for (let i in body) {
+            if (body[i] instanceof Object) {
+                if (verify("member", body[i].memberID) && verify("date", body[i].time) && verify("specification", body[i].specification)) {
+                    let appointmentID = "A" + encrytionID(6, body[i].memberID, body[i].time, body[i].specification);
+                    sqlStatement = `INSERT INTO appointments(memberID, appointmentTime, specification, appointmentID) VALUES (?, ?, ?, ?)`;
+                    console.log(sqlStatement);
+
+                    db.run(sqlStatement, [body[i].memberID, body[i].time, body[i].specification, appointmentID], function(err) {
+                        if (err) {
+                            console.log("error");
+                            response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                        } else {
+                            response.writeHead(resMsg.code = 201, resMsg.hdrs);
+                        }
+                        setHeader(resMsg);
+                        response.end(resMsg.body);
+                    });
+                } else {
+                    response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                    setHeader(resMsg);
+                    response.end(resMsg.body);
+                }
+            }
+        }
+    });
+
+    db.close();
+}
+
+
+module.exports = createAppointment, createAppointmentLite;

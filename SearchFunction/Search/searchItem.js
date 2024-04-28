@@ -1,7 +1,7 @@
 const url = require('url');
 const mysql = require('mysql2');
 const sql3 = require('sqlite3').verbose();
-
+const config = require('../config.js');
 function isValidSearchString(searchString) {
     // Validate search string: 2 - 50 characters
     console.log(searchString);
@@ -17,10 +17,10 @@ function isValidMemberID(memberID) {
 function searchItem(request, response) {
     let resMsg = {};
     let dBCon = mysql.createConnection({ // Create a new database connection
-        host: 'localhost',
-        user: 'root',
-        database: 'SHOP',
-        password: 'sql65536!#HYUJ'
+        host: config.host,
+        user: config.user,
+        password: config.password,
+        database: config.database
     });
 
     // Extract query parameters from the request URL

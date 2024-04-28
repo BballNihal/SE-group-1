@@ -12,6 +12,7 @@ format:
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
 const connectToLiteDatabase = require('../connectToDatabase.js');
+
 function listOrderDetails(request,response) {
       let resMsg = {};
       var dBCon = connectToDatabase();
@@ -49,4 +50,36 @@ function listOrderDetails(request,response) {
    )
 }
 
-module.exports = listOrderDetails;
+function listOrderDetailsLite(request, response) {
+   let resMsg = {};
+   let db = connectToLiteDatabase();
+   let prebody = '';
+   let sqlStatement;
+
+   request.on('data', function(data) {
+       prebody += data;
+       let body = JSON.parse(prebody);
+
+       for (let i in body) {
+           if (body[i] instanceof Object) {
+               sqlStatement = `SELECT price, cartID, paymentInfo FROM orders WHERE orderID = ?`;
+               console.log(sqlStatement);
+
+               db.get(sqlStatement, [body[i].orderID], function(err, row) {
+                   if (err) {
+                       response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                   } else {
+                       response.writeHead(resMsg.code = 200, resMsg.hdrs);
+                   }
+                   setHeader(resMsg);
+                   resMsg.body = `${row.cartID}, $${row.price}, payment info: ${row.paymentInfo}\n`;
+                   response.end(resMsg.body);
+               });
+           }
+       }
+   });
+
+   db.close();
+}
+
+module.exports = listOrderDetails, listOrderDetailsLite;

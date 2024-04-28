@@ -86,8 +86,54 @@ function Browse(request, response) {
         return resMsg.body;
     });
 }
+function BrowseLite(request, response) {
+    const dBCon = connectToLiteDatabase(); 
+    const parsedUrl = url.parse(request.url, true);
+    const productID = parsedUrl.pathname.substring(8,);
+    if (!isValidProductID(productID)) {
+        const resMsg = {
+            code: 400,
+            body: "Invalid product ID format"
+        };
+        response.writeHead(resMsg.code, { "Content-Type": "application/json" });
+        response.end(JSON.stringify(resMsg.body));
+        return;
+    }
+    const sqlStatement = `
+        SELECT nameVar, productType, price FROM products WHERE productID = '`+productID+"';";
+    dBCon.all(sqlStatement, [productID], (error, rows) => {
+        if (error) {
+            console.error("Error executing SQL query:", error);
+            const resMsg = {
+                code: 500,
+                body: "Internal Server Error"
+            };
+            response.writeHead(resMsg.code, { "Content-Type": "application/json" });
+            response.end(JSON.stringify(resMsg.body));
+        } else {
+            if (rows.length > 0) {
+                const resMsg = {
+                  code: 200,
+                  body: rows[0].nameVar
+              };
+                response.writeHead(200, { "Content-Type": "application/json" });
+                response.end(resMsg.body);
+            } else {
+                const resMsg = {
+                    code: 404,
+                    body: "Product not found"
+                };
+                response.writeHead(resMsg.code, { "Content-Type": "application/json" });
+                response.end(JSON.stringify(resMsg.body));
+            }
+        }
+        dBCon.close();
 
-module.exports = Browse;
+        return resMsg.body;
+    });
+}
+
+module.exports = Browse, BrowseLite;
 
 /*
 function browse(request,response) {

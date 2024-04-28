@@ -51,5 +51,38 @@ function listOrders(request,response) {
       }
    )
 }
+function listOrdersLite(request, response) {
+   let resMsg = {};
+   let db = connectToLiteDatabase();
+   let prebody = '';
+   let sqlStatement;
 
-module.exports = listOrders;
+   request.on('data', function(data) {
+       prebody += data;
+       let body = JSON.parse(prebody);
+
+       for (let i in body) {
+           if (body[i] instanceof Object) {
+               sqlStatement = `SELECT orderID FROM orders WHERE memberID = ?`;
+               console.log(sqlStatement);
+
+               db.all(sqlStatement, [body[i].memberID], function(err, rows) {
+                   if (err) {
+                       response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                   } else {
+                       response.writeHead(resMsg.code = 200, resMsg.hdrs);
+                   }
+                   setHeader(resMsg);
+                   resMsg.body = "";
+                   rows.forEach((row) => {
+                       resMsg.body += `${row.orderID}\n`;
+                   });
+                   response.end(resMsg.body);
+               });
+           }
+       }
+   });
+
+   db.close();
+}
+module.exports = listOrders, listOrdersLite;

@@ -50,17 +50,39 @@ function update(request,response) {
     })
 }
 
-function clearCart() {
+function updateLite(request, response) {
+  let resMsg = {};
+  var dBCon = connectToLiteDatabase();
+  var prebody = '';
+  var sqlStatement;
+  request.on('data', function(data) {
+      prebody += data;
+      body = JSON.parse(prebody);
+      for (i in body) {
+          if (body[i] instanceof Object) {
+              sqlStatement = "UPDATE cart SET quantity = " +
+                  body[i].quantity + " WHERE cartID = '" + body[i].cartID + "' AND productID = '" + body[i].productID + "';";
+              console.log(sqlStatement);
+              dBCon.run(sqlStatement, function(err) {
+                  if (err) {
+                      response.writeHead(resMsg.code = 400, resMsg.hdrs);
+                  } else {
+                      response.writeHead(resMsg.code = 201, resMsg.hdrs);
+                  }
+                  setHeader(resMsg);
+                  response.end(resMsg.body);
+                  dBCon.close();
+                  return resMsg.body;
+              });
+          }
+      }
+  })
+}
 
-}
-function calculateTotal() {
-    total = 0;
-    return total;
-}
 class Item {
     constructor(name, price) {
       this.name = name;
       this.price = price;
     }
   }
-module.exports = update;
+module.exports = update, updateLite;
