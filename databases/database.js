@@ -115,6 +115,11 @@ const server = http.createServer((req, res) => {
 
                 adminGetMember(req,res,requestData,memberdb);
                 break;
+
+            case 'GET /transaction':
+
+                adminGetTransaction(req,res,requestData,transactiondb);
+                break;    
                 
             default:
 
