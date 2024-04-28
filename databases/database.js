@@ -8,7 +8,10 @@ AUTHOR: Henry Sprigle
 
 Implemented password hashing to work with member database 
 Implemented Post, Put,and delete methods for discount and transaction database
-AUTHOR: Thomas Vu
+AUTHOR: Thomas Vu Yum Powder
+
+Made Post, Put, Delete, and Get methods for product database compatible with code structure
+AUTHOR: Nihal Abdul Muneer
 */
 
 const http = require('http');
@@ -19,6 +22,7 @@ const stringHash = require('./passwordHash.js');
 const adminAddMember = require('./adminAddmember.js');
 const adminUpdateMember = require('./adminUpdateMember.js');
 const adminDeleteMember = require('./adminDeleteMember.js');
+const adminGetMember = require('./adminGetMember.js');
 
 const adminAddDiscount = require('./adminAddDiscount.js');
 const adminUpdateDiscount = require('./adminUpdateDiscount.js');
@@ -28,9 +32,23 @@ const adminAddTransaction = require('./adminAddTransaction.js');
 const adminUpdateTransaction = require('./adminUpdateTransaction.js');
 const adminDeleteTransction = require ('./adminDeleteTransaction.js');
 
+const {getProducts} = require('./getProducts.js');
+const {updateProductQuantity} = require('./updateProductQuantity.js');
+const {deleteProductFromDatabase} = require('./deleteProductFromDatabase.js');
+const {addProductToDatabase} = require('./addProductToDatabase.js');
+
+const querystring = require('querystring');
+
 let memberdb = new sqlite3.Database('./memberData.db');
 let discountdb = new sqlite3.Database('./discountData.db');
 let transactiondb = new sqlite3.Database('./transactionData.db');
+
+let productdb = new sqlite3.Database('databases/productDB/products.db', (err) => {
+    if (err) {
+      console.error(err.message);
+    }
+    console.log('Connected to the products database.');
+});
 
 let lastMemberID = 0;
 
@@ -38,10 +56,11 @@ const server = http.createServer((req, res) => {
     const reqUrl = url.parse(req.url, true);
     const path = reqUrl.pathname;
     const method = req.method;
+
     
 
     //Discount database requests
-
+    
     let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
@@ -50,7 +69,16 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
 
          try {
-             var requestData = JSON.parse(body);
+            switch (`${method} ${path}`) {
+
+                case 'GET /products':
+                    break;
+                
+                default:
+                    var requestData = JSON.parse(body);
+                    break;
+            }
+            
          } catch (error){
              res.writeHead(400, { 'Content-Type': 'text/plain' });
              res.end(`Error parsing: ${error}`);
@@ -71,6 +99,11 @@ const server = http.createServer((req, res) => {
                 adminDeleteMember(req, res, requestData, memberdb);
                 break;
 
+            case 'GET /member':
+
+                adminGetMember(req,res,requestData,memberdb);
+
+                break;
             case 'POST /discount':
                 
                 adminAddDiscount(res,requestData,discountdb);
@@ -111,6 +144,41 @@ const server = http.createServer((req, res) => {
 
                 break;//end of case delete /transaction
 
+            case 'GET /transaction':
+
+                adminGetTransaction(req,res,requestData,transactiondb);
+                
+                break;    
+
+            case 'GET /products':
+
+                const productIDget = reqUrl.query.productID; // Extract productID from parsed query
+                getProducts(req, res, productIDget, productdb);
+
+                break;
+            
+            case 'POST /products':
+
+                const product = JSON.parse(body);
+                addProductToDatabase(productdb, product, res);
+
+                break;
+            
+            case 'DELETE /products':
+
+                const productIDdel = JSON.parse(body).productID;
+                deleteProductFromDatabase(productdb, productIDdel, res);
+
+                break;
+                
+            case 'PUT /products':
+
+                const { productID, change } = JSON.parse(body);
+                updateProductQuantity(productdb, productID, change, res);
+
+                break;
+
+            
             default:
 
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -169,6 +237,14 @@ transactiondb.run(`CREATE TABLE IF NOT EXISTS transactions (orderId TEXT,product
         return;
     }
     console.log(`transactions Table created successfully`);
+});
+
+productdb.run(`CREATE TABLE IF NOT EXISTS products (productID TEXT,productType TEXT , name TEXT, price Text, quantity INT)`, (err) => {
+    if(err) {
+        console.error('Failed to create products table',err);
+        return;
+    }
+    console.log(`products Table created successfully`);
 });
 
 

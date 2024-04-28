@@ -2,39 +2,36 @@
 
 const sqlite3 = require('sqlite3').verbose();
 
-function getProducts(req, res) {
-  const productID = req.body.productID; // Retrieve productID from the request body
-
-  // Open the database
-  let db = new sqlite3.Database('databases/productDB/products.db', (err) => {
-    if (err) {
-      console.error(err.message);
-      res.status(500).send('Error connecting to the database');
-      return;
-    }
-    console.log('Connected to the products database.');
-
-    if (productID) {
+function getProducts(req, res, productID, db) {
+  if (productID) {
       // Fetch product by ID
       let sql = `SELECT * FROM products WHERE productID = ?`;
       db.get(sql, [productID], (err, row) => {
-        if (err) {
-          res.status(500).send('Error fetching product');
-          return;
-        }
-        res.send(row);
+          if (err) {
+              res.writeHead(500, { 'Content-Type': 'text/plain' });
+              res.end('Error fetching product');
+              return;
+          }
+          if (row) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify(row));
+          } else {
+              res.writeHead(404, { 'Content-Type': 'text/plain' });
+              res.end('Product not found');
+          }
       });
-    } else {
+  } else {
       // No productID provided, fetch all products
       db.all('SELECT * FROM products', [], (err, rows) => {
-        if (err) {
-          res.status(500).send('Error fetching products');
-          return;
-        }
-        res.send(rows);
+          if (err) {
+              res.writeHead(500, { 'Content-Type': 'text/plain' });
+              res.end('Error fetching products');
+              return;
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(rows));
       });
-    }
-  });
+  }
 }
 
 module.exports = { getProducts };
