@@ -110,7 +110,12 @@ const server = http.createServer((req, res) => {
                 adminDeleteTransction(res,requestData,transactiondb);
 
                 break;//end of case delete /transaction
+                
+            case 'GET /member':
 
+                adminGetMember(req,res,requestData,memberdb);
+                break;
+                
             default:
 
                 res.writeHead(404, { 'Content-Type': 'text/plain' });
