@@ -1,5 +1,6 @@
 const url = require('url');
-const connectToDatabase = require('../connectToDatabase.js');
+const connectToDatabase = require('./connectToDatabase.js');
+const connectToLiteDatabase = require('./connectToDatabase.js');
 
 function isValidProductID(productID) {
     // Validate product ID format: Capital P followed by 5-digit number (00000 - 99999)

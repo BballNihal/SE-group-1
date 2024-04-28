@@ -1,6 +1,7 @@
 
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
+const connectToLiteDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
 const encrytionID = require('./encrytionID.js');
 //const sta = require('../idStandard.js');

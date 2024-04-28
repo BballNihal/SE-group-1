@@ -1,7 +1,7 @@
 
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
-
+const connectToLiteDatabase = require('../connectToDatabase.js');
 /*clears a user's cart
 (working)
 POST cart/clear

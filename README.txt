@@ -15,3 +15,5 @@ select * from products;
 ____________________________
 Use database from subgroup 1 or
 use databaseProducts.sql to initialize product database (test usage)
+____________________________
+sqlite implementing***

@@ -14,7 +14,7 @@ function connectToDatabase() {
     });
     return connection;
 }
-module.exports = connectToDatabase;
+
 // retrieve data from lite database file
 var sqlite3 = require('sqlite3').verbose();
 
@@ -28,4 +28,4 @@ function connectToLiteDatabase() {
     return db;
 }
 
-module.exports = connectToLiteDatabase;
+module.exports = connectToLiteDatabase, connectToDatabase;

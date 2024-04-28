@@ -1,6 +1,7 @@
 
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
+const connectToLiteDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
 //const verifyUserStatus = require("../verifyUserStatus.js");
 
@@ -59,20 +60,51 @@ function addItem(request,response) {
     })
 }
 
+function addItemLite(request,response) {
+  let resMsg = {};
+  var dBCon = connectToLiteDatabase();
+  var prebody='';
+  var sqlStatement;
 
-
-
-function clearCart() {
-
+  request.on('data', function(data){
+      prebody+=data;
+      body = JSON.parse(prebody);
+      console.log("adding");
+     
+    for (i in body) {
+      if (body[i] instanceof Object) {
+        if(verify("cart",body[i].cartID) & verify("product",body[i].productID)&verify("quantity",body[i].quantity))  {
+        sqlStatement = "INSERT INTO cart(cartID, productID, quantity)";
+  sqlStatement+= "VALUES ('"+body[i].cartID+"','"+body[i].productID+"',"+body[i].quantity+");";
+          console.log(sqlStatement);
+  dBCon.run(sqlStatement, function (err) { 
+      if (err) {
+        response.writeHead(resMsg.code=400, resMsg.hdrs);
+        }else{
+        response.writeHead(resMsg.code=201, resMsg.hdrs); 
+      }  
+      setHeader(resMsg);
+      resMsg.body="";
+      resMsg.body+="Added successfully"
+      response.end(resMsg.body);
+      dBCon.close(); 
+      return resMsg.body;
+    }); } else {
+      response.writeHead(resMsg.code=400, resMsg.hdrs);
+      setHeader(resMsg);
+      resMsg.body="Improper input"
+      response.end(resMsg.body);
+      dBCon.close(); 
+    }
+      }}
+    
+  })
 }
-function calculateTotal() {
-    total = 0;
-    return total;
-}
+
 class Item {
     constructor(name, price) {
       this.name = name;
       this.price = price;
     }
   }
-module.exports = addItem;
+module.exports = addItem, addItemLite;

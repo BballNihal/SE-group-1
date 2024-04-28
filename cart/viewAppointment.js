@@ -1,9 +1,10 @@
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
+const connectToLiteDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
 
 // /*get all appointments belonging to one member
-// GET appointment/list
+// GET appointment/view
 // format:
 // {
 //    "ABC":{
@@ -12,7 +13,7 @@ const verify = require('../verify.js');
 // }
 // */
 
-function listAppointment(request,response) {
+function viewAppointment(request,response) {
     let resMsg = {};
     var dBCon = connectToDatabase();
     var prebody='';
@@ -48,4 +49,4 @@ function listAppointment(request,response) {
     })
 }
 
-module.exports = listAppointment;
+module.exports = viewAppointment;

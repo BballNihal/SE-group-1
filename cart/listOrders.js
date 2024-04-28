@@ -10,6 +10,7 @@ format:
 
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
+const connectToLiteDatabase = require('../connectToDatabase.js');
 
 function listOrders(request,response) {
       let resMsg = {};

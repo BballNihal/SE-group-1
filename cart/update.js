@@ -9,6 +9,7 @@ function setHeader(resMsg){
   
   }
 const connectToDatabase = require('../connectToDatabase.js');
+const connectToLiteDatabase = require('../connectToDatabase.js');
 
 /*updates the quantity of a user's item
 POST cart/update
