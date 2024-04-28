@@ -1,6 +1,7 @@
 const http = require('http');
 const url = require('url');
 const ticketController = require('./controllers/ticketController');
+const productController = require('./controllers/productController');
 
 require('./models/db');
 
@@ -57,6 +58,12 @@ const server = http.createServer((req, res) => {
             ticketController.openTicket({ params: { ticketId }, body: data }, res);
         }else if (path.startsWith('/tickets/faqs') && method === 'GET') {
             ticketController.getFAQs(req, res);
+        }else if (path === '/product/reviews/form' && method === 'POST') {
+            productController.submitReview({ body: data }, res);
+        } else if (path === '/product/reviews' && method === 'DELETE') {
+            productController.deleteReview({ query: queryParams }, res);
+        } else if (path === '/product/reviews/edit' && method === 'POST') {
+            productController.editReview({ body: data }, res);
         }else {
             res.statusCode = 404;
             res.end(JSON.stringify({ message: "Route not found." }));
