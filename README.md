@@ -7,7 +7,7 @@ localhost and 127.0.0.1 are interchangeable
 UserId of -1 is admin.
 same user and admin can access sa
 
-To create a ticket
+To create a ticket (POST Method)
 http://localhost:3000/tickets/create
 {
   "userId": "39",
@@ -15,7 +15,7 @@ http://localhost:3000/tickets/create
   "description": "This is a test for demo 1"
 }
 
-To reply to a ticket
+To reply to a ticket (POST Method)
 http://127.0.0.1:3000/tickets/reply
 {
     "ticketId": "10",
@@ -23,17 +23,17 @@ http://127.0.0.1:3000/tickets/reply
     "message": "This is a reply"
 }
 
-To get a detailed list of a ticket
+To get a detailed list of a ticket (GET Method)
 http://127.0.0.1:3000/tickets/details/10?userId=39
 no body needed
 
-To close a ticket
+To close a ticket (POST Method)
 http://127.0.0.1:3000/tickets/close/8
 {
     "userId": "-1"
 }
 
-To open a ticket
+To open a ticket (POST Method)
 http://127.0.0.1:3000/tickets/open/8
 {
     "userId": "-1"
