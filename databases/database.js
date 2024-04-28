@@ -23,7 +23,6 @@ const adminAddMember = require('./adminAddmember.js');
 const adminUpdateMember = require('./adminUpdateMember.js');
 const adminDeleteMember = require('./adminDeleteMember.js');
 const adminGetMember = require('./adminGetMember.js');
-const adminGetMember = require('./adminGetMember.js');
 
 const adminAddDiscount = require('./adminAddDiscount.js');
 const adminUpdateDiscount = require('./adminUpdateDiscount.js');
