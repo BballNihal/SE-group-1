@@ -1,12 +1,23 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const dbPath = path.resolve(__dirname, './customerService.db');
-const productController = require('./controllers/productController');
 
 
 let db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err) console.error('Error opening database', err);
     else console.log('Connected to the SQLite database at', dbPath);
+});
+
+// Define the path to the transaction database
+const dbPath2 = path.resolve(__dirname, 'path/to/transactionData.db');
+
+// Create the database connection
+let transactiondb = new sqlite3.Database(dbPath2, sqlite3.OPEN_READWRITE, (err) => {
+    if (err) {
+        console.error('Error opening database', err);
+    } else {
+        console.log('Connected to the transaction database.');
+    }
 });
 
 exports.addReview = (memberId, productId, reviewContent, callback) => {
@@ -64,3 +75,18 @@ exports.getReviewDetails = (reviewId, callback) => {
         }
     });
 };
+
+exports.getDeliveryStatus = (memberId, productId, callback) => {
+    // Connecting to the external database (assumed to be already configured)
+    const sql = 'SELECT deliveryStatus FROM transactions WHERE productId = ? AND memberId = ?';
+    transactiondb.get(sql, [productId, memberId], (err, row) => {
+        if (err) {
+            callback(err, null);
+        } else if (row) {
+            callback(null, row.deliveryStatus);
+        } else {
+            callback(null, null); // No data found
+        }
+    });
+};
+
