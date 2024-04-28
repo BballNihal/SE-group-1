@@ -91,6 +91,22 @@ function initializeDatabase() {
         console.log('TicketReplies table created or already exists.');
       }
     });
+    // Create Appointments table
+    db.run(`
+      CREATE TABLE IF NOT EXISTS Appointments (
+        AppointmentID INTEGER PRIMARY KEY AUTOINCREMENT,
+        MemberID INTEGER NOT NULL,
+        AppointmentTime DATETIME NOT NULL,
+        Specification TEXT,
+        FOREIGN KEY(MemberID) REFERENCES Users(UserID)
+      );
+    `, [], err => {
+      if (err) {
+        console.error('Error creating Appointments table:', err);
+      } else {
+        console.log('Appointments table created or already exists.');
+      }
+    });
   });
 }
 

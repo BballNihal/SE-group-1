@@ -2,6 +2,7 @@ const http = require('http');
 const url = require('url');
 const ticketController = require('./controllers/ticketController');
 const productController = require('./controllers/productController');
+const appointmentController = require('./controllers/appointmentController'); // Make sure to import this
 
 require('./models/db');
 
@@ -64,7 +65,15 @@ const server = http.createServer((req, res) => {
             productController.deleteReview({ query: queryParams }, res);
         } else if (path === '/product/reviews/edit' && method === 'POST') {
             productController.editReview({ body: data }, res);
-        }else {
+        } else if (path === '/appointment/add' && method === 'POST') {
+            appointmentController.addAppointment({ body: data }, res);
+        } else if (path === '/appointment/cancel' && method === 'DELETE') {
+            appointmentController.cancelAppointment({ query: queryParams }, res);
+        } else if (path === '/appointment' && method === 'GET') {
+            appointmentController.viewAppointment({ query: queryParams }, res);
+        } else if (path === '/appointment/change' && method === 'POST') {
+            appointmentController.changeAppointment({ body: data }, res);
+        } else {
             res.statusCode = 404;
             res.end(JSON.stringify({ message: "Route not found." }));
         }
