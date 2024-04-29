@@ -3,310 +3,322 @@
 
 
 const http = require('http');
-const url = require('url');
+const url = require ('url');
 const { OAuth2Client } = require('google-auth-library');
 const sqlite3 = require('sqlite3').verbose();
 const axios = require('axios');
-const {setUsername, getUsername, clearUser} = require('./globalVar');
+const { setUsername, clearUser } = require('./globalVar');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-
-
 
 const client = new OAuth2Client('565011930264-ktu1iofamjrl4tt7eudf2grpmjtb8nmk.apps.googleusercontent.com');
 let db = new sqlite3.Database('./memberData.db');
 let lastMemberID = 0;
 
 async function hashPassword(password) {
-    const saltRounds = 10; // Cost factor for bcrypt
+    const saltRounds = 10; 
     return await bcrypt.hash(password, saltRounds);
 }
+
 async function comparePassword(password, hashedPassword) {
     return await bcrypt.compare(password, hashedPassword);
 }
 
 function generateToken(username) {
     const randomKey = generateRandomKey();
-  
+
     const token = jwt.sign({ username: username, randomKey: randomKey }, 'secret_key', { expiresIn: '1h' });
+    console.log('Generated Token:', token); 
     return token;
-  }
-  
-  function generateRandomKey() {
+}
+
+function generateRandomKey() {
     const randomNumber = Math.floor(Math.random() * 1000000);
     const randomKey = randomNumber.toString().padStart(6, '0');
     return randomKey;
-  }
-
-
-const server = http.createServer(async(req, res) => {
-  const reqUrl = url.parse(req.url, true);
-  const path = reqUrl.pathname;
-  const method = req.method;
-
-  //CALLBACK FOR GOOGLE
-  //callback with google this is where we grab the user information after they sign in.
-  if (path === '/auth/google/callback') {
-    const token = reqUrl.query.token;
-
-    if (token) {
-      // Verify the token with Google
-      client.verifyIdToken({
-        idToken: token,
-        audience: '565011930264-ktu1iofamjrl4tt7eudf2grpmjtb8nmk.apps.googleusercontent.com'
-      }).then((ticket) => {
-        const payload = ticket.getPayload();
-        const userid = payload['sub'];
-        
-        db.get('SELECT username FROM members WHERE userid = ?', userid, (err,row) =>{
-            if (err){
-                res.writeHead(500, {'Content-Type': 'text/plain'});
-                res.end('Database Error');
-            } else{
-                if (row){
-                    setUsername(row.username);
-                    res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify(payload));
-                }
-            }
-        });
-      }).catch((error) => {
-        // Handle verification failure
-        res.writeHead(401, {'Content-Type': 'text/plain'});
-        res.end('Unauthorized');
-      });
-  }
 }
-//where we call facebook to sign in. Currently my request is pending for verification once approved link should work.
-//will take you to the facebook page just not currently accessible yet.
-//PATH TO FACEBOOK
-  else if(path === '/auth/facebook'){
-    const redirectUrl = `https://www.facebook.com/v11.0/dialog/oauth?client_id=1452675045679886&redirect_uri=http://localhost:3000/auth/facebook/callback`;
-    res.writeHead(302, { 'Location': redirectUrl });
-    res.end();
-    
-  } //callback to the website after facebook login. This is where we can grab the information.  
-  //CALLBACK FROM FACEBOOK
-  else if (path === '/auth/facebook/callback') {
+
+const server = http.createServer(async (req, res) => {
+    const reqUrl = url.parse(req.url, true);
+    const path = reqUrl.pathname;
+    const method = req.method;
+
+    // Function to verify token
+    function verifyToken(req, res, next) {
+        const bearerHeader = req.headers['authorization'];
+
+        if (typeof bearerHeader !== 'undefined') {
+            const bearer = bearerHeader.split(' ');
+            const token = bearer[1];
+            jwt.verify(token, 'secret_key', (err, authData) => {
+                if (err) {
+                    res.writeHead(403, { 'Content-Type': 'text/plain' });
+                    res.end('Forbidden');
+                } else {
+                    // Token is verified
+                    req.authData = authData;
+                    next();
+                }
+            });
+        } else {
+            // Token not provided
+            res.writeHead(403, { 'Content-Type': 'text/plain' });
+            res.end('Forbidden');
+        }
+    }
+
+    // Protected route, requires token for access
+    if (path === '/member') {
+        verifyToken(req, res, () => {
+            // Authenticated, return data or redirect to main screen
+            res.end('Member Authenticated');
+        });
+    } else if (path === '/auth/google/callback') {
+        const token = reqUrl.query.token;
+
+        if (token) {
+            // Verify the token with Google
+            client.verifyIdToken({
+                idToken: token,
+                audience: '565011930264-ktu1iofamjrl4tt7eudf2grpmjtb8nmk.apps.googleusercontent.com'
+            }).then((ticket) => {
+                const payload = ticket.getPayload();
+                const userid = payload['sub'];
+
+                db.get('SELECT username FROM members WHERE userid = ?', userid, (err, row) => {
+                    if (err) {
+                        res.writeHead(500, { 'Content-Type': 'text/plain' });
+                        res.end('Database Error');
+                    } else {
+                        if (row) {
+                            setUsername(row.username);
+                            res.writeHead(200, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify(payload));
+                        }
+                    }
+                });
+            }).catch((error) => {
+                // Handle verification failure
+                res.writeHead(401, { 'Content-Type': 'text/plain' });
+                res.end('Unauthorized');
+            });
+        }
+    } else if (path === '/auth/facebook') {
+        const redirectUrl = `https://www.facebook.com/v11.0/dialog/oauth?client_id=1452675045679886&redirect_uri=http://localhost:3000/auth/facebook/callback`;
+        res.writeHead(302, { 'Location': redirectUrl });
+        res.end();
+    } else if (path === '/auth/facebook/callback') {
         const code = reqUrl.query.code;
         if (code) {
             try {
                 const accessTokenResponse = await axios.get(`https://graph.facebook.com/v11.0/oauth/access_token?client_id=1452675045679886&redirect_uri=http://localhost:3000/auth/facebook/callback&client_secret=f24cd1e0e6235c47f932216275a75af8&code=${code}`);
                 const accessToken = accessTokenResponse.data.access_token;
                 const userDataResponse = await axios.get(`https://graph.facebook.com/me?fields=id,name,email&access_token=${accessToken}`);
-                
+
                 // Handle user authentication and data retrieval here
                 const userData = userDataResponse.data;
                 setUsername(userData.name);
-                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(userData));
             } catch (error) {
                 console.error('Error:', error.response.data);
-                res.writeHead(500, {'Content-Type': 'text/plain'});
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
                 res.end('Internal Server Error');
             }
         } else {
-            res.writeHead(400, {'Content-Type': 'text/plain'});
+            res.writeHead(400, { 'Content-Type': 'text/plain' });
             res.end('Code is required');
         }
-    } //CALL TO GOOGLE
-  else if(method === 'GET' && path === '/auth/google'){
-    // Redirect user to Google Sign-In page
-    const redirectUrl = 'https://accounts.google.com/o/oauth2/v2/auth' +
-                        '?client_id=565011930264-ktu1iofamjrl4tt7eudf2grpmjtb8nmk.apps.googleusercontent.com' +
-                        '&redirect_uri=http://localhost:3000/auth/google/callback' +
-                        '&response_type=code' +
-                        '&scope=email%20profile';
-    
-    res.writeHead(302, { 'Location': redirectUrl });
-    res.end();
-  }else if (method === 'POST' && path === '/member') {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      const member = JSON.parse(body);
+    } else if (method === 'GET' && path === '/auth/google') {
+        // Redirect user to Google Sign-In page
+        const redirectUrl = 'https://accounts.google.com/o/oauth2/v2/auth' +
+            '?client_id=565011930264-ktu1iofamjrl4tt7eudf2grpmjtb8nmk.apps.googleusercontent.com' +
+            '&redirect_uri=http://localhost:3000/auth/google/callback' +
+            '&response_type=code' +
+            '&scope=email%20profile';
 
-      // Validation code
-      const requiredProperties = ['username', 'password', 'phoneNumber', 'adminStatus'];
-      for (let prop of requiredProperties) {
-        if (!member.hasOwnProperty(prop)) {
-          res.writeHead(400, {'Content-Type': 'text/plain'});
-          res.end(`Missing required property: ${prop}`);
-          return;
-        }
-      }
-      const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-      if (!emailRegex.test(member.username)) {
-        res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.end('Username must be a valid email');
-        return;
-      }
+        res.writeHead(302, { 'Location': redirectUrl });
+        res.end();
+    } else if (method === 'POST' && path === '/member/signup') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const member = JSON.parse(body);
 
-      const phoneRegex = /^\d{10,15}$/;
-      if (!phoneRegex.test(member.phoneNumber)) {
-        res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.end('Phone number must be a valid number with 10 to 15 digits');
-        return;
-      }
-
-      if (![0, 1].includes(member.adminStatus)) {
-        res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.end('Admin status must be 0 (normal) or 1 (admin)');
-        return;
-      }
-
-      if (lastMemberID >= 9999999999) {
-        res.writeHead(500, {'Content-Type': 'text/plain'});
-        res.end('No more member IDs available');
-        return;
-      }
-
-      lastMemberID++;
-      member.memberID = 'M' + String(lastMemberID).padStart(10, '0');
-
-      hashPassword(member.password).then(hashedPassword => {
-        db.run(`INSERT INTO members VALUES (?, ?, ?, ?, ?)`, [member.memberID, member.username, hashedPassword, member.phoneNumber, member.adminStatus], function(err) {
-        if (err) {
-          res.writeHead(500, {'Content-Type': 'text/plain'});
-          res.end('Database error');
-        } else {
-        setUsername(member.username);
-          res.end(`Member registered successfully. Your member ID is ${member.memberID}`);
-        }
-      });
-    }).catch(err => {
-        res.writeHead(500, {'Content-Type': 'text/plain'});
-        res.end('Error hashing password');
-    });
-});
-  } else if (method === 'PUT' && path.startsWith('/member/')) {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      const member = JSON.parse(body);
-      const memberID = path.split('/')[2];
-
-      db.run(`UPDATE members SET username = ?, password = ?, phoneNumber = ?, adminStatus = ? WHERE memberID = ?`, [member.username, member.password, member.phoneNumber, member.adminStatus, memberID], function(err) {
-        if (err) {
-          res.writeHead(500, {'Content-Type': 'text/plain'});
-          res.end('Database error');
-        } else {
-          res.end(`Member updated successfully. Your member ID is ${memberID}`);
-        }
-      });
-    });
-  } //where we grab the information from the member and delete it based on that. 
-  else if (method === 'DELETE' && path.startsWith('/member/')) {
-    let body = '';
-    req.on('data',chunk => {
-        body += chunk.toString();
-    });
-    req.on('end',() =>{
-        const requestData = JSON.parse(body);
-        const {username, pass, memberID} = requestData;
-
-        db.get('SELECT username, password FROM members WHERE memberID = ?', memberID, (err,row) => {
-            if (err){
-                res.writeHead(500, { 'Content-Type': 'text/plain'});
-                res.end('Database error');
-            } else{
-                console.log(memberID);
-                if (row){
-                    if (row.username === username && row.pass === pass){
-                        db.run(`DELETE FROM members WHERE memberID = ?`, memberID, function(err) {
-                            if (err) {
-                              res.writeHead(500, {'Content-Type': 'text/plain'});
-                              res.end('Database error');
-                            } else {
-                                clearUser();
-                                res.writeHead(200, { 'Content-Type':'text/plain'});
-                                res.end(`Member deleted successfully. Your member ID was ${memberID}`);
-                            }
-                          });
-                    } else {
-                        res.writeHead(401, {'Content-Type': 'text/plain'});
-                        res.end('Unauthorized');
-                    }
-                } else {
-                    res.writeHead(404, {'Content-Type' : 'text/plain'});
-                    res.end('Member not found');
+            // Validation code
+            const requiredProperties = ['username', 'password', 'phoneNumber', 'adminStatus'];
+            for (let prop of requiredProperties) {
+                if (!member.hasOwnProperty(prop)) {
+                    res.writeHead(400, { 'Content-Type': 'text/plain' });
+                    res.end(`Missing required property: ${prop}`);
+                    return;
                 }
-            }  
-        })
-    })
-  } else if (method === 'POST' && path === '/member/login') {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      const loginData = JSON.parse(body);
-      const { username, password } = loginData;
-  
-      db.get('SELECT * FROM members WHERE username = ?', [username], (err, row) => {
-        if (err) {
-            res.writeHead(500, { 'Content-Type': 'text/plain' });
-            res.end('Database error');
-        } else {
-            if (row) {
-                // Compare hashed password
-                comparePassword(password, row.password).then(match => {
-                    if (match) {
-                        // Passwords match, proceed with login
-                        const token = generateToken(username);
-                        res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` });
-                        res.end(JSON.stringify({ message: 'Login successful', token: token }));
+            }
+            const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+            if (!emailRegex.test(member.username)) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('Username must be a valid email');
+                return;
+            }
+
+            const phoneRegex = /^\d{10,15}$/;
+            if (!phoneRegex.test(member.phoneNumber)) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('Phone number must be a valid number with 10 to 15 digits');
+                return;
+            }
+
+            if (![0, 1].includes(member.adminStatus)) {
+                res.writeHead(400, { 'Content-Type': 'text/plain' });
+                res.end('Admin status must be 0 (normal) or 1 (admin)');
+                return;
+            }
+
+            if (lastMemberID >= 9999999999) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('No more member IDs available');
+                return;
+            }
+
+            lastMemberID++;
+            member.memberID = 'M' + String(lastMemberID).padStart(10, '0');
+
+            hashPassword(member.password).then(hashedPassword => {
+                db.run(`INSERT INTO members VALUES (?, ?, ?, ?, ?)`, [member.memberID, member.username, hashedPassword, member.phoneNumber, member.adminStatus], function (err) {
+                    if (err) {
+                        res.writeHead(500, { 'Content-Type': 'text/plain' });
+                        res.end('Database error');
                     } else {
-                        // Passwords don't match
+                        setUsername(member.username);
+                        res.end(`Member registered successfully. Your member ID is ${member.memberID}`);
+                    }
+                });
+            }).catch(err => {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Error hashing password');
+            });
+        });
+    } else if (method === 'PUT' && path.startsWith('/member/')) {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const member = JSON.parse(body);
+            const memberID = path.split('/')[2];
+    
+            db.run(`UPDATE members SET username = ?, password = ?, phoneNumber = ?, adminStatus = ? WHERE memberID = ?`, [member.username, member.password, member.phoneNumber, member.adminStatus, memberID], function (err) {
+                if (err) {
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Database error');
+                } else {
+                    res.end(`Member updated successfully. Your member ID is ${memberID}`);
+                }
+            });
+        });
+    } else if (method === 'DELETE' && path.startsWith('/member/')) {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const requestData = JSON.parse(body);
+            const { username, password, memberID } = requestData;
+    
+            db.get('SELECT username, password FROM members WHERE memberID = ?', memberID, (err, row) => {
+                if (err) {
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Database error');
+                } else {
+                    console.log(memberID);
+                    if (row) {
+                        if (row.username === username && row.password === password) {
+                            db.run(`DELETE FROM members WHERE memberID = ?`, memberID, function (err) {
+                                if (err) {
+                                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                                    res.end('Database error');
+                                } else {
+                                    res.writeHead(200, { 'Content-Type': 'text/plain' });
+                                    res.end(`Member deleted successfully. Your member ID was ${memberID}`);
+                                }
+                            });
+                        } else {
+                            res.writeHead(401, { 'Content-Type': 'text/plain' });
+                            res.end('Unauthorized');
+                        }
+                    } else {
+                        res.writeHead(404, { 'Content-Type': 'text/plain' });
+                        res.end('Member not found');
+                    }
+                }
+            });
+        });
+    } else if (method === 'POST' && path === '/member/login') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const loginData = JSON.parse(body);
+            const { username, password } = loginData;
+    
+            db.get('SELECT * FROM members WHERE username = ?', [username], (err, row) => {
+                if (err) {
+                    res.writeHead(500, { 'Content-Type': 'text/plain' });
+                    res.end('Database error');
+                } else {
+                    if (row) {
+                        // Compare hashed password
+                        comparePassword(password, row.password).then(match => {
+                            if (match) {
+                                // Passwords match, proceed with login
+                                const token = generateToken(username);
+                                res.writeHead(200, { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` });
+                                res.end(JSON.stringify({ message: 'Login successful', token: token }));
+                            } else {
+                                // Passwords don't match
+                                res.writeHead(401, { 'Content-Type': 'text/plain' });
+                                res.end('Invalid username or password');
+                            }
+                        }).catch(err => {
+                            console.error('Error comparing passwords:', err);
+                            res.writeHead(500, { 'Content-Type': 'text/plain' });
+                            res.end('Error comparing passwords');
+                        });
+                    } else {
                         res.writeHead(401, { 'Content-Type': 'text/plain' });
                         res.end('Invalid username or password');
                     }
-                }).catch(err => {
-                    console.error('Error comparing passwords:', err);
-                    res.writeHead(500, { 'Content-Type': 'text/plain' });
-                    res.end('Error comparing passwords');
-                });
-            } else {
-                res.writeHead(401, { 'Content-Type': 'text/plain' });
-                res.end('Invalid username or password');
-            }
+                }
+            });
+        });
+    }
+});
+
+db.serialize(() => {
+    db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='members'`, (err, row) => {
+        if (!row) {
+            db.run(`CREATE TABLE members (memberID TEXT, username TEXT, password TEXT, phoneNumber TEXT, adminStatus INTEGER)`, (err) => {
+                if (err) {
+                    console.error('Failed to create table:', err);
+                    return;
+                }
+                console.log('Table created successfully.');
+            });
+        }
+    });
+
+    db.get(`SELECT memberID FROM members ORDER BY memberID DESC LIMIT 1`, (err, row) => {
+        if (row) {
+            lastMemberID = parseInt(row.memberID.substring(1));
         }
     });
 });
-  }else {
-    res.statusCode = 404;
-    res.end('Not Found');
-  }
-  });
 
-db.serialize(() => {
-  db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='members'`, (err, row) => {
-    if (!row) {
-      db.run(`CREATE TABLE members (memberID TEXT, username TEXT, password TEXT, phoneNumber TEXT, adminStatus INTEGER)`, (err) => {
-        if (err) {
-          console.error('Failed to create table:', err);
-          return;
-        }
-        console.log('Table created successfully.');
-      });
-    }
-  });
-
-  db.get(`SELECT memberID FROM members ORDER BY memberID DESC LIMIT 1`, (err, row) => {
-    if (row) {
-      lastMemberID = parseInt(row.memberID.substring(1));
-    }
-  });
+server.listen(3001, () => {
+    console.log('Server listening on port 3001');
 });
 
-server.listen(3000, () => {
-  console.log('Server listening on port 3000');
-});
 module.exports = server;
-
-//authenticate to access database.
-//
