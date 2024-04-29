@@ -1,7 +1,3 @@
-//Author: Henry Sprigle
-//Edited by: Joel A.
-
-
 const http = require('http');
 const url = require ('url');
 const { OAuth2Client } = require('google-auth-library');
@@ -317,8 +313,8 @@ db.serialize(() => {
     });
 });
 
-server.listen(3001, () => {
-    console.log('Server listening on port 3001');
+server.listen(3000, () => {
+    console.log('Server listening on port 3000');
 });
 
 module.exports = server;
