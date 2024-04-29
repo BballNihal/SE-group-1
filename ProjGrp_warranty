@@ -1,138 +1,206 @@
 const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
+const jwt = require('jsonwebtoken');
 
-let db = new sqlite3.Database('./memberServicesData.db');
+const SECRET_KEY = process.env.SECRET_KEY || 'your_secret_key';
+
+const db = new sqlite3.Database('./memberServicesData.db');
 let lastEntryID = 0;
+
+const createWarrantiesTable = `
+  CREATE TABLE IF NOT EXISTS warranties (
+    entryID TEXT PRIMARY KEY,
+    name TEXT,
+    description TEXT,
+    duration INTEGER
+  )
+`;
+db.run(createWarrantiesTable, (err) => {
+  if (err) {
+    console.error('Error creating warranties table:', err.message);
+  } else {
+    console.log('Warranties table created successfully');
+  }
+});
+const clearWarrantiesTable = (req, res) => {
+  db.run("DELETE FROM warranties", [], (err) => {
+    if (err) {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Failed to clear table: ' + err.message);
+    } else {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('All records deleted successfully');
+    }
+  });
+};
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, SECRET_KEY, { expiresIn: '1h' });
+};
+
+
+function verifyToken(req) {
+  return new Promise((resolve, reject) => {
+    const bearerHeader = req.headers['authorization'];
+
+    if (typeof bearerHeader !== 'undefined') {
+      const bearer = bearerHeader.split(' ');
+      const token = bearer[1];
+      jwt.verify(token, SECRET_KEY, (err, authData) => {
+        if (err) {
+          reject(err);
+        } else {
+
+          resolve(authData);
+        }
+      });
+    } else {
+      reject(new Error('Token not provided'));
+    }
+  });
+}
 
 const server = http.createServer((req, res) => {
   const reqUrl = url.parse(req.url, true);
   const path = reqUrl.pathname;
   const method = req.method;
 
-  if (method === 'POST' && (path === '/discount' || path === '/warranty')) {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
+  if (method === 'POST' && path === '/generate-token') {
+    handleTokenGeneration(req, res);
+  } else if (method === 'POST' && path === '/warranty') {
+      handlePostRequest(req, res);
+  }else if(method === 'GET' && path === '/clear-table'){
+
+  clearWarrantiesTable(req,res);
+  
+  } else if (method === 'PUT' &&  path.startsWith('/warranty/')) {
+    verifyToken(req, res, () => {
+      handlePutRequest(req, res, path);
     });
-    req.on('end', () => {
-      const entry = JSON.parse(body);
-
-      // Validation code
-      const requiredProperties = ['name', 'description', 'duration'];
-      if (path === '/discount') {
-        requiredProperties.push('discountPercentage');
-      }
-      for (let prop of requiredProperties) {
-        if (!entry.hasOwnProperty(prop)) {
-          res.writeHead(400, {'Content-Type': 'text/plain'});
-          res.end(`Missing required property: ${prop}`);
-          return;
-        }
-      }
-
-      // Additional validation for duration, percentage, etc. can be added
-
-      if (lastEntryID >= 99999) {
-        res.writeHead(500, {'Content-Type': 'text/plain'});
-        res.end('No more entry IDs available');
-        return;
-      }
-
-      lastEntryID++;
-      entry.entryID = path === '/discount' ? 'D' + String(lastEntryID).padStart(5, '0') : 'W' + String(lastEntryID).padStart(5, '0');
-
-      const tableName = path === '/discount' ? 'discounts' : 'warranties';
-      const columns = path === '/discount' ? ['entryID', 'name', 'description', 'duration', 'discountPercentage'] : ['entryID', 'name', 'description', 'duration'];
-      const values = columns.map(col => entry[col]);
-
-      db.run(`INSERT INTO ${tableName} VALUES (${columns.map(() => '?').join(', ')})`, values, function(err) {
-        if (err) {
-          res.writeHead(500, {'Content-Type': 'text/plain'});
-          res.end('Database error');
-        } else {
-          res.end(`Entry registered successfully. Your entry ID is ${entry.entryID}`);
-        }
-      });
-    });
-  } else if (method === 'PUT' && (path.startsWith('/discount/') || path.startsWith('/warranty/'))) {
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      const entry = JSON.parse(body);
-      const entryID = path.split('/')[2];
-      const tableName = path.startsWith('/discount/') ? 'discounts' : 'warranties';
-      const columns = path.startsWith('/discount/') ? ['name', 'description', 'duration', 'discountPercentage'] : ['name', 'description', 'duration'];
-      const updateParams = columns.map(col => entry[col]);
-
-      db.run(`UPDATE ${tableName} SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE entryID = ?`, [...updateParams, entryID], function(err) {
-        if (err) {
-          res.writeHead(500, {'Content-Type': 'text/plain'});
-          res.end('Database error');
-        } else {
-          res.end(`Entry updated successfully. Your entry ID is ${entryID}`);
-        }
-      });
-    });
-  } else if (method === 'DELETE' && (path.startsWith('/discount/') || path.startsWith('/warranty/'))) {
-    const entryID = path.split('/')[2];
-
-    const tableName = path.startsWith('/discount/') ? 'discounts' : 'warranties';
-    
-    db.run(`DELETE FROM ${tableName} WHERE entryID = ?`, entryID, function(err) {
-      if (err) {
-        res.writeHead(500, {'Content-Type': 'text/plain'});
-        res.end('Database error');
-      } else {
-        res.end(`Entry deleted successfully. Your entry ID was ${entryID}`);
-      }
+  } else if (method === 'DELETE' && path.startsWith('/warranty/')) {
+    verifyToken(req, res, () => {
+      handleDeleteRequest(req, res, path);
     });
   } else {
-    res.statusCode = 404;
-    res.end('Not Found');
+    notFound(res);
   }
 });
 
-db.serialize(() => {
-  db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='discounts'`, (err, row) => {
-    if (!row) {
-      db.run(`CREATE TABLE discounts (entryID TEXT, name TEXT, description TEXT, duration INTEGER, discountPercentage REAL)`, (err) => {
-        if (err) {
-          console.error('Failed to create discounts table:', err);
+const handleTokenGeneration = (req, res) => {
+    const reqUrl = url.parse(req.url, true);
+    const path = reqUrl.pathname;
+  
+   // let responseMessage = '';
+    //if (path === '/generate-token/warranty') {
+    //  responseMessage = 'warranty authorized';
+    //} else {
+    //  responseMessage = 'Invalid token request';
+   // }
+  
+    const token = generateToken('admin');
+  
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ token }));
+  };
+
+  const handlePostRequest = async (req, res) => {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', async () => {
+      try {
+        const entry = JSON.parse(body);
+        const authData = await verifyToken(req);
+  
+        const requiredProperties = ['name', 'description', 'duration'];
+        for (let prop of requiredProperties) {
+          if (!entry.hasOwnProperty(prop)) {
+            badRequest(res, `Missing required property: ${prop}`);
+            return;
+          }
+        }
+  
+        if (lastEntryID >= 99999) {
+          internalServerError(res, 'No more entry IDs available');
           return;
         }
-        console.log('Discounts table created successfully.');
-      });
-    }
-  });
+  
+        lastEntryID++;
+        entry.entryID = 'W' + String(lastEntryID).padStart(5, '0');
+  
+        db.run(`INSERT INTO warranties VALUES (?, ?, ?, ?)`, [entry.entryID, entry.name, entry.description, entry.duration], function(err) {
+          if (err) {
+            console.log(entry.entryID);
+            console.error(err.message);
+            internalServerError(res, 'Database error');
+          } else {
+            // Send response indicating the warranty was verified and registered successfully
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end(`Warranty verified and registered successfully. Your entry ID is ${entry.entryID}`);
+          }
+        });
+      } catch (error) {
+        unauthorized(res);
+      }
+    });
+  };
+  
 
-  db.get(`SELECT name FROM sqlite_master WHERE type='table' AND name='warranties'`, (err, row) => {
-    if (!row) {
-      db.run(`CREATE TABLE warranties (entryID TEXT, name TEXT, description TEXT, duration INTEGER)`, (err) => {
-        if (err) {
-          console.error('Failed to create warranties table:', err);
-          return;
-        }
-        console.log('Warranties table created successfully.');
-      });
-    }
-  });
 
-  db.get(`SELECT entryID FROM discounts ORDER BY entryID DESC LIMIT 1`, (err, row) => {
-    if (row) {
-      lastEntryID = parseInt(row.entryID.substring(1));
-    }
+const handlePutRequest = (req, res, path) => {
+  let body = '';
+  req.on('data', chunk => {
+    body += chunk.toString();
   });
+  req.on('end', () => {
+    const entry = JSON.parse(body);
+    const entryID = path.split('/')[2];
 
-  db.get(`SELECT entryID FROM warranties ORDER BY entryID DESC LIMIT 1`, (err, row) => {
-    if (row) {
-      const id = parseInt(row.entryID.substring(1));
-      lastEntryID = Math.max(lastEntryID, id);
+    const columns = ['name', 'description', 'duration'];
+    const updateParams = columns.map(col => entry[col]);
+
+    db.run(`UPDATE warranties SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE entryID = ?`, [...updateParams, entryID], function(err) {
+      if (err) {
+        internalServerError(res, 'Database error');
+      } else {
+        res.end(`Warranty updated successfully. Your entry ID is ${entryID}`);
+      }
+    });
+  });
+};
+
+const handleDeleteRequest = (req, res, path) => {
+  const entryID = path.split('/')[2];
+
+  db.run(`DELETE FROM warranties WHERE entryID = ?`, entryID, function(err) {
+    if (err) {
+      internalServerError(res, 'Database error');
+    } else {
+      res.end(`Warranty deleted successfully. Your entry ID was ${entryID}`);
     }
   });
-});
+};
+
+const notFound = (res) => {
+  res.statusCode = 404;
+  res.end('Not Found');
+};
+
+const unauthorized = (res) => {
+  res.writeHead(401, { 'Content-Type': 'text/plain' });
+  res.end('Unauthorized');
+};
+
+const badRequest = (res, message) => {
+  res.writeHead(400, { 'Content-Type': 'text/plain' });
+  res.end(message);
+};
+
+const internalServerError = (res, message) => {
+  res.writeHead(500, { 'Content-Type': 'text/plain' });
+  res.end(message);
+};
 
 server.listen(3000, () => {
   console.log('Server listening on port 3000');
