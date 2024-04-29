@@ -7,9 +7,11 @@ function setUsername(newUsername) {
 function getUsername() {
     return username;
 }
-function clearUser(){
-    username =null;
+
+function clearUser() {
+    username = '';
 }
+
 module.exports = {
     setUsername,
     getUsername,
