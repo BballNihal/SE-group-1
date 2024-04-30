@@ -1,0 +1,200 @@
+const http = require('http');
+const url = require('url');
+const sqlite3 = require('sqlite3').verbose();
+const jwt = require('jsonwebtoken');
+
+const SECRET_KEY = process.env.SECRET_KEY || 'your_secret_key';
+
+const db = new sqlite3.Database('./discountServicesData.db');
+let lastEntryID = 0;
+
+const createDiscountsTable = `
+  CREATE TABLE IF NOT EXISTS discounts (
+    entryID TEXT PRIMARY KEY,
+    name TEXT,
+    description TEXT,
+    percentage REAL
+  )
+`;
+db.run(createDiscountsTable, (err) => {
+  if (err) {
+    console.error('Error creating discounts table:', err.message);
+  } else {
+    console.log('Discounts table created successfully');
+  }
+});
+
+const clearDiscountsTable = (req, res) => {
+  db.run("DELETE FROM discounts", [], (err) => {
+    if (err) {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Failed to clear table: ' + err.message);
+    } else {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('All records deleted successfully');
+    }
+  });
+};
+
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, SECRET_KEY, { expiresIn: '1h' });
+};
+
+function verifyToken(req) {
+  return new Promise((resolve, reject) => {
+    const bearerHeader = req.headers['authorization'];
+
+    if (typeof bearerHeader !== 'undefined') {
+      const bearer = bearerHeader.split(' ');
+      const token = bearer[1];
+      jwt.verify(token, SECRET_KEY, (err, authData) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(authData);
+        }
+      });
+    } else {
+      reject(new Error('Token not provided'));
+    }
+  });
+}
+
+const server = http.createServer((req, res) => {
+  const reqUrl = url.parse(req.url, true);
+  const path = reqUrl.pathname;
+  const method = req.method;
+
+  if (method === 'POST' && path === '/generate-token') {
+    handleTokenGeneration(req, res);
+  } else if (method === 'POST' && path === '/discount') {
+    handlePostRequest(req, res);
+  } else if (method === 'GET' && path === '/clear-table') {
+    clearDiscountsTable(req, res);
+  } else if (method === 'PUT' && path.startsWith('/discount/')) {
+    verifyToken(req, res)
+      .then(() => {
+        handlePutRequest(req, res, path);
+      })
+      .catch(() => {
+        unauthorized(res);
+      });
+  } else if (method === 'DELETE' && path.startsWith('/discount/')) {
+    verifyToken(req, res)
+      .then(() => {
+        handleDeleteRequest(req, res, path);
+      })
+      .catch(() => {
+        unauthorized(res);
+      });
+  } else {
+    notFound(res);
+  }
+});
+
+const handleTokenGeneration = (req, res) => {
+  const token = generateToken('admin');
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ token }));
+};
+
+const handlePostRequest = async (req, res) => {
+  let body = '';
+  req.on('data', chunk => {
+    body += chunk.toString();
+  });
+  req.on('end', async () => {
+    try {
+      const entry = JSON.parse(body);
+      const authData = await verifyToken(req);
+
+      const requiredProperties = ['name', 'description', 'percentage'];
+      for (let prop of requiredProperties) {
+        if (!entry.hasOwnProperty(prop)) {
+          badRequest(res, `Missing required property: ${prop}`);
+          return;
+        }
+      }
+
+      if (lastEntryID >= 99999) {
+        internalServerError(res, 'No more entry IDs available');
+        return;
+      }
+
+      lastEntryID++;
+      entry.entryID = 'D' + String(lastEntryID).padStart(5, '0');
+
+      db.run(`INSERT INTO discounts VALUES (?, ?, ?, ?)`, [entry.entryID, entry.name, entry.description, entry.percentage], function(err) {
+        if (err) {
+          console.error(err.message);
+          internalServerError(res, 'Database error');
+        } else {
+          res.writeHead(200, { 'Content-Type': 'text/plain' });
+          res.end(`Discount verified and registered successfully. Your entry ID is ${entry.entryID}`);
+        }
+      });
+    } catch (error) {
+      unauthorized(res);
+    }
+  });
+};
+
+const handlePutRequest = (req, res, path) => {
+  let body = '';
+  req.on('data', chunk => {
+    body += chunk.toString();
+  });
+  req.on('end', () => {
+    const entry = JSON.parse(body);
+    const entryID = path.split('/')[2];
+
+    const columns = ['name', 'description', 'percentage'];
+    const updateParams = columns.map(col => entry[col]);
+
+    db.run(`UPDATE discounts SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE entryID = ?`, [...updateParams, entryID], function(err) {
+      if (err) {
+        internalServerError(res, 'Database error');
+      } else {
+        res.end(`Discount updated successfully. Your entry ID is ${entryID}`);
+      }
+    });
+  });
+};
+
+const handleDeleteRequest = (req, res, path) => {
+  const entryID = path.split('/')[2];
+
+  db.run(`DELETE FROM discounts WHERE entryID = ?`, entryID, function(err) {
+    if (err) {
+      internalServerError(res, 'Database error');
+    } else {
+      res.end(`Discount deleted successfully. Your entry ID was ${entryID}`);
+    }
+  });
+};
+
+const notFound = (res) => {
+  res.statusCode = 404;
+  res.end('Not Found');
+};
+
+const unauthorized = (res) => {
+  res.writeHead(401, { 'Content-Type': 'text/plain' });
+  res.end('Unauthorized');
+};
+
+const badRequest = (res, message) => {
+  res.writeHead(400, { 'Content-Type': 'text/plain' });
+  res.end(message);
+};
+
+const internalServerError = (res, message) => {
+  res.writeHead(500, { 'Content-Type': 'text/plain' });
+  res.end(message);
+};
+
+server.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
+
+module.exports = server;
