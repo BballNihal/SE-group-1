@@ -1,0 +1,9 @@
+{
+   "Order":{
+    "cartID":"C123456789",
+    "paymentInfo":"ABC",
+    "discountCode":"2A3B4F",
+    "price":123.45,
+    "memberID":"M1234567890123456"
+   }
+}

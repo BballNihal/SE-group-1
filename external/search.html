@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Site</title>
+</head>
+<body>
+
+<h1>Search and Navigate Example</h1>
+
+<input type="text" id="searchInput" placeholder="Search...">
+<button onclick="searchAndNavigate()">Go</button>
+<h2>Register as member:</h2>>
+<button onclick="goToMembershipPage()">Go2</button>
+<h2>View Cart</h2>>
+<button onclick="goToCartPage()">Go2</button>
+<div id="results"></div>
+
+<script>
+    function goToMembershipPage() {
+        window.location.href = "registerAsMember.html";
+    
+    }
+    function goToCartPage() {
+        window.location.href = "myCart.html";
+    
+    }
+function searchAndNavigate() {
+    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    
+    switch (searchTerm) {
+        case "page1":
+            window.location.href = "htmlTest.html";
+            break;
+        default:
+       
+            if (searchTerm.length < 5){
+            document.getElementById("results").innerText = "Input '" + searchTerm + "' is too short";
+            }else {
+                window.location.href = "searchResults.html";
+            break;
+
+            }
+        }
+
+}
+</script>
+
+</body>
+</html>

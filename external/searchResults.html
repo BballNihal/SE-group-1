@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Site</title>
+</head>
+<body>
+
+<h1>Enter membership info</h1>
+
+print Results
+2
+3
+<input type="text" id="searchInputB" placeholder="Search...">
+<button onclick="searchResults()">Enter</button>
+
+<div id="results"></div>
+
+<script>
+
+
+function memberName() {
+    // Get the search input value
+    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    
+    // Define your search logic here
+    switch (searchTerm) {
+        case "page1":
+            window.location.href = "htmlTest.html";
+            break;
+        default:
+       
+            if (true/*verify("member",searchTerm*/){
+            document.getElementById("results").innerText = "Input '" + searchTerm + "' is too short";
+            }else {
+                window.location.href = "htmlTest.html";
+            break;
+
+            }
+        }
+
+}
+function searchResults() {
+    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    
+    switch (searchTerm) {
+        default:
+       
+            if (searchTerm.length < 5){
+            document.getElementById("results").innerText = "Input '" + searchTerm + "' is too short";
+            }else {
+                document.getElementById("results").innerText = "Added 1 " + searchTerm + " to cart.";
+                addToCartByString(searchTerm);
+
+            }
+        }
+
+}
+</script>
+
+</body>
+</html>

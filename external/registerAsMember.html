@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Site</title>
+</head>
+<body>
+
+<h1>Enter membership info</h1>
+
+<input type="text" id="searchInput" placeholder="Search...">
+<button onclick="memberName()">Go</button>
+<h2>Password:</h2>
+<input type="text" id="searchInputA" placeholder="Search...">
+<h2>Confirm Password:</h2>
+<input type="text" id="searchInputB" placeholder="Search...">
+<button onclick="password()">Enter</button>
+
+<div id="results"></div>
+
+<script>
+
+    function password() {
+        var passwordA = document.getElementById("searchInputA").value;
+        var passwordB = document.getElementById("searchInputB").value;
+        if (passwordA!=passwordB) {
+            document.getElementById("results").innerText = "Passwords do not match";
+        }
+        else if (true/*verify("password",searchInput)*/) {
+            var pass1;
+            document.getElementById("results").innerText = "Password verified";
+        }
+        else {
+           document.getElementById("results").innerText = "Password not verified";
+        }
+    }
+function memberName() {
+    // Get the search input value
+    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    
+    // Define your search logic here
+    switch (searchTerm) {
+        case "page1":
+            window.location.href = "htmlTest.html";
+            break;
+        default:
+       
+            if (true/*verify("member",searchTerm*/){
+            document.getElementById("results").innerText = "Input '" + searchTerm + "' is too short";
+            }else {
+                window.location.href = "htmlTest.html";
+            break;
+
+            }
+        }
+
+}
+</script>
+
+</body>
+</html>

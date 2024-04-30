@@ -1,0 +1,8 @@
+{
+    "CART":{
+    "cartID":"C1234567890",
+    "memberID":"M1234567890",
+    "productID":"P123456789012345",
+    "quantity":123
+    }
+}

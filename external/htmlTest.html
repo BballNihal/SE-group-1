@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p>This example contains a form with a submit button that submits the form to a new window:</p>
+
+<form action="/action_page.php" method="get">
+  First name: <input type="text" name="fname" value="Donald"><br>
+  Last name: <input type="text" name="lname" value="Duck"><br>
+  <button id="myBtn" type="submit" formtarget="_blank">Submit</button>
+</form>
+
+<p>Click on the "Try it" button to change the value of the formtarget attribute of the submit button above.</p>
+
+<p><b>Note:</b> Click on the submit button before and after you have clicked on the "Try it" button.</p>
+
+<button onclick="myFunction()">Try it</button>
+
+<p id="demo"></p>
+
+<script>
+function myFunction() {
+  document.getElementById("myBtn").formTarget = "_self";
+  document.getElementById("demo").innerHTML = searchOutput();
+}
+</script>
+
+</body>
+</html>
+    
