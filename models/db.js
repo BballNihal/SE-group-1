@@ -58,8 +58,8 @@ function initializeDatabase() {
     db.run(`
       CREATE TABLE IF NOT EXISTS ProductReviews (
         ReviewID TEXT PRIMARY KEY CHECK(ReviewID GLOB 'R[0-9][0-9][0-9][0-9][0-9]'),
-        MemberID TEXT NOT NULL CHECK(MemberID GLOB 'M[0-9][0-9][0-9][0-9][0-9]'),
-        ProductID TEXT NOT NULL CHECK(ProductID GLOB 'P[0-9][0-9][0-9][0-9][0-9]'),
+        MemberID TEXT NOT NULL CHECK(MemberID GLOB 'M[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
+        ProductID TEXT NOT NULL CHECK(ProductID GLOB 'P[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),
         ReviewContent TEXT,
         Rating INTEGER CHECK(Rating >= 1 AND Rating <= 5),
         CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
