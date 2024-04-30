@@ -10,50 +10,49 @@ format:
 
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
-const connectToLiteDatabase = require('../connectToDatabase.js');
 
-function listOrders(request,response) {
-      let resMsg = {};
-      var dBCon = connectToDatabase();
-      var prebody='';
-      var sqlStatement;
-      request.on('data', function(data){
-         prebody+=data;
-         body = JSON.parse(prebody);
-         for (i in body) {
-            if (body[i] instanceof Object) {
-               sqlStatement = "SELECT orderID FROM orders WHERE memberID='"+body[i].memberID+"';";
-               console.log(sqlStatement);
-               dBCon.query(sqlStatement, function (err, result) {
-                  if (err) {
-                        response.writeHead(resMsg.code=400, resMsg.hdrs);
-                  }else{
-                        response.writeHead(resMsg.code=200, resMsg.hdrs); 
-                  }  
-                  setHeader(resMsg);
-                  //response.end(JSON.stringify(result));
-                  var i =0;
-                  var r;
-                  resMsg.body = "";
-                  while (result[i] != undefined) {
-                     console.log(i);
-                     console.log(result[i]);
+// function listOrders(request,response) {
+//       let resMsg = {};
+//       var dBCon = connectToDatabase();
+//       var prebody='';
+//       var sqlStatement;
+//       request.on('data', function(data){
+//          prebody+=data;
+//          body = JSON.parse(prebody);
+//          for (i in body) {
+//             if (body[i] instanceof Object) {
+//                sqlStatement = "SELECT orderID FROM orders WHERE memberID='"+body[i].memberID+"';";
+//                console.log(sqlStatement);
+//                dBCon.query(sqlStatement, function (err, result) {
+//                   if (err) {
+//                         response.writeHead(resMsg.code=400, resMsg.hdrs);
+//                   }else{
+//                         response.writeHead(resMsg.code=200, resMsg.hdrs); 
+//                   }  
+//                   setHeader(resMsg);
+//                   //response.end(JSON.stringify(result));
+//                   var i =0;
+//                   var r;
+//                   resMsg.body = "";
+//                   while (result[i] != undefined) {
+//                      console.log(i);
+//                      console.log(result[i]);
          
-                  resMsg.body+=result[i].orderID+"\n";
-                  i++;
-                  }
-                  response.end(resMsg.body);
-                  dBCon.end();
-                  return resMsg.body;
-               });
-            }
-         }
-      }
-   )
-}
-function listOrdersLite(request, response) {
+//                   resMsg.body+=result[i].orderID+"\n";
+//                   i++;
+//                   }
+//                   response.end(resMsg.body);
+//                   dBCon.end();
+//                   return resMsg.body;
+//                });
+//             }
+//          }
+//       }
+//    )
+// }
+function listOrders(request, response) {
    let resMsg = {};
-   let db = connectToLiteDatabase();
+   let db = connectToDatabase();
    let prebody = '';
    let sqlStatement;
 
@@ -85,4 +84,4 @@ function listOrdersLite(request, response) {
 
    db.close();
 }
-module.exports = listOrders, listOrdersLite;
+module.exports = listOrders;

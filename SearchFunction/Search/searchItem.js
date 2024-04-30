@@ -1,6 +1,5 @@
 const url = require('url');
-const connectToLiteDatabase = require('../connectToDatabase.js');
-const connectToDatabase = require('../connectToDatabase.js');
+const connectToDatabase = require('../../connectToDatabase.js');
 
 function isValidSearchString(searchString) {
     // Validate search string: 2 - 50 characters
@@ -14,71 +13,71 @@ function isValidMemberID(memberID) {
     return typeof memberID === 'string' && regex.test(memberID);
 }
 
-function searchItem(request, response) {
-    let resMsg = {};
-    let dBCon = connectToDatabase(); 
+// function searchItem(request, response) {
+//     let resMsg = {};
+//     let dBCon = connectToDatabase(); 
 
-    // Extract query parameters from the request URL
-    const parsedUrl = url.parse(request.url, true);
-    console.log(parsedUrl);
-    const query = parsedUrl.query;
-    console.log(parsedUrl.pathname.substring(8,));
-    const memberId = "M1234567890";//query.memberId;
-    console.log(memberId);
-    const searchString = parsedUrl.pathname.substring(8,);//query.searchString;
-    console.log(searchString);
-    const productId = query.productId; // Assuming productIds is an array of product IDs
+//     // Extract query parameters from the request URL
+//     const parsedUrl = url.parse(request.url, true);
+//     console.log(parsedUrl);
+//     const query = parsedUrl.query;
+//     console.log(parsedUrl.pathname.substring(8,));
+//     const memberId = "M1234567890";//query.memberId;
+//     console.log(memberId);
+//     const searchString = parsedUrl.pathname.substring(8,);//query.searchString;
+//     console.log(searchString);
+//     const productId = query.productId; // Assuming productIds is an array of product IDs
 
-    // Validate search string and member ID
-    if (!isValidSearchString(searchString) || !isValidMemberID(memberId)) {
-        resMsg.code = 400;
-        resMsg.body = "Invalid search string or member ID format";
-        response.writeHead(resMsg.code, { "Content-Type": "text/plain" });
-        response.end(resMsg.body);
-        return;
-    }
-    console.log("valid");
-    // Check if member exists and is active
+//     // Validate search string and member ID
+//     if (!isValidSearchString(searchString) || !isValidMemberID(memberId)) {
+//         resMsg.code = 400;
+//         resMsg.body = "Invalid search string or member ID format";
+//         response.writeHead(resMsg.code, { "Content-Type": "text/plain" });
+//         response.end(resMsg.body);
+//         return;
+//     }
+//     console.log("valid");
+//     // Check if member exists and is active
           
          
-                    // Construct SQL statement based on the search parameters
-                    let sqlStatement = "SELECT * FROM products WHERE nameVar LIKE '%"+searchString+"%';";
-                    console.log(sqlStatement);
-                    const params = [/*memberId, */'%${searchString}%']; // Using `%` for wildcard search with LIKE operator
-                    console.log(sqlStatement);
-                    // If specific product IDs are provided, add them to the query
-                    /*if (productIds && productIds.length > 0) {
-                        sqlStatement += " product_id IN (?)"; // Assuming productIds is an array of product IDs
-                        params.push(productIds);
-                    }*/
-                    console.log(sqlStatement);
-                    // Execute the SQL query
-                    dBCon.query(sqlStatement,/* params,*/ (error, results) => {
-                        if (error) {
-                            console.error("Error executing SQL query:", error);
-                            resMsg.code = 500;
-                            resMsg.body = "Internal Server Error";
-                        } else {
-                            resMsg.code = 200;
-                            resMsg.body = JSON.stringify(results); // Assuming products are retrieved from the database
-                        }
+//                     // Construct SQL statement based on the search parameters
+//                     let sqlStatement = "SELECT * FROM products WHERE nameVar LIKE '%"+searchString+"%';";
+//                     console.log(sqlStatement);
+//                     const params = [/*memberId, */'%${searchString}%']; // Using `%` for wildcard search with LIKE operator
+//                     console.log(sqlStatement);
+//                     // If specific product IDs are provided, add them to the query
+//                     /*if (productIds && productIds.length > 0) {
+//                         sqlStatement += " product_id IN (?)"; // Assuming productIds is an array of product IDs
+//                         params.push(productIds);
+//                     }*/
+//                     console.log(sqlStatement);
+//                     // Execute the SQL query
+//                     dBCon.query(sqlStatement,/* params,*/ (error, results) => {
+//                         if (error) {
+//                             console.error("Error executing SQL query:", error);
+//                             resMsg.code = 500;
+//                             resMsg.body = "Internal Server Error";
+//                         } else {
+//                             resMsg.code = 200;
+//                             resMsg.body = JSON.stringify(results); // Assuming products are retrieved from the database
+//                         }
 
-                        // Send response
-                        response.writeHead(resMsg.code, { "Content-Type": "application/json" });
-                        response.end(resMsg.body);
-                        return resMsg;
-                    });
+//                         // Send response
+//                         response.writeHead(resMsg.code, { "Content-Type": "application/json" });
+//                         response.end(resMsg.body);
+//                         return resMsg;
+//                     });
                 
             
 
-            // Close the database connection
-            dBCon.end();
+//             // Close the database connection
+//             dBCon.end();
         
-}
+// }
 
-function searchItemLite(request, response) {
+function searchItem(request, response) {
     let resMsg = {};
-    let dBCon = connectToLiteDatabase(); // Assuming connectToLiteDatabase is a function that returns a SQLite database connection
+    let dBCon = connectToDatabase(); // Assuming connectToDatabase is a function that returns a SQ database connection
 
     // Extract query parameters from the request URL
     const parsedUrl = url.parse(request.url, true);
@@ -138,7 +137,7 @@ function searchItemLite(request, response) {
         
 }
 
-module.exports = searchItem, searchItemLite;
+module.exports = searchItem;
 /*
 // Check if member exists and is active
     dBCon.query(

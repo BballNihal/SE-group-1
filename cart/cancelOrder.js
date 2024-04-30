@@ -10,41 +10,40 @@ format:
 
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
-const connectToLiteDatabase = require('../connectToDatabase.js');
 const c = require('config');
 //set order status to cancelled if it is pending
-function cancelOrder(request,response) {
-      let resMsg = {};
-      var dBCon = connectToDatabase();
-      var prebody='';
-      var sqlStatement;
-      request.on('data', function(data){
-         prebody+=data;
-         body = JSON.parse(prebody);
-         for (i in body) {
-            if (body[i] instanceof Object) {
-               sqlStatement = "UPDATE orders SET statusVar ='Canceled' WHERE orderID='"+body[i].orderID+"' AND statusVar ='pending';";
-               console.log(sqlStatement);
-               dBCon.query(sqlStatement, function (err, result) {
-                  if (err) {
-                        response.writeHead(resMsg.code=400, resMsg.hdrs);
-                  }else{
-                        response.writeHead(resMsg.code=201, resMsg.hdrs); 
-                  }  
-                  setHeader(resMsg);
-                  response.end(resMsg.body);
-                  dBCon.end();
-                  return resMsg.body;
-               });
-            }
-         }
-      }
-   )
-}
+// function cancelOrder(request,response) {
+//       let resMsg = {};
+//       var dBCon = connectToDatabase();
+//       var prebody='';
+//       var sqlStatement;
+//       request.on('data', function(data){
+//          prebody+=data;
+//          body = JSON.parse(prebody);
+//          for (i in body) {
+//             if (body[i] instanceof Object) {
+//                sqlStatement = "UPDATE orders SET statusVar ='Canceled' WHERE orderID='"+body[i].orderID+"' AND statusVar ='pending';";
+//                console.log(sqlStatement);
+//                dBCon.query(sqlStatement, function (err, result) {
+//                   if (err) {
+//                         response.writeHead(resMsg.code=400, resMsg.hdrs);
+//                   }else{
+//                         response.writeHead(resMsg.code=201, resMsg.hdrs); 
+//                   }  
+//                   setHeader(resMsg);
+//                   response.end(resMsg.body);
+//                   dBCon.end();
+//                   return resMsg.body;
+//                });
+//             }
+//          }
+//       }
+//    )
+// }
 
-function cancelOrderLite(request,response) {
+function cancelOrder(request,response) {
    let resMsg = {};
-   var dBCon = connectToLiteDatabase();
+   var dBCon = connectToDatabase();
    var prebody='';
    var sqlStatement;
 
@@ -71,4 +70,4 @@ function cancelOrderLite(request,response) {
    })
 }
 
-module.exports = cancelOrder, cancelOrderLite;
+module.exports = cancelOrder;

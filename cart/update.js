@@ -9,7 +9,7 @@ function setHeader(resMsg){
   
   }
 const connectToDatabase = require('../connectToDatabase.js');
-const connectToLiteDatabase = require('../connectToDatabase.js');
+
 
 /*updates the quantity of a user's item
 POST cart/update
@@ -22,37 +22,37 @@ format:
    }
 }
 */
-function update(request,response) {
-    let resMsg = {};
-    var dBCon = connectToDatabase();
-    var prebody='';
-    var sqlStatement;
-    request.on('data', function(data){
-        prebody+=data;
-        body = JSON.parse(prebody);
-      for (i in body) {
-        if (body[i] instanceof Object) {
-            sqlStatement = "UPDATE cart SET quantity = "+
-            body[i].quantity+" WHERE cartID = '"+ body[i].cartID+ "' AND productID = '"+body[i].productID+"';";
-            console.log(sqlStatement);
-    dBCon.query(sqlStatement, function (err, result) {
-        if (err) {
-          response.writeHead(resMsg.code=400, resMsg.hdrs);
-          }else{
-          response.writeHead(resMsg.code=201, resMsg.hdrs); 
-        }  
-        setHeader(resMsg);
-        response.end(resMsg.body);
-        dBCon.end();
-        return resMsg.body;
-      });
-        }}
-    })
-}
+// function update(request,response) {
+//     let resMsg = {};
+//     var dBCon = connectToDatabase();
+//     var prebody='';
+//     var sqlStatement;
+//     request.on('data', function(data){
+//         prebody+=data;
+//         body = JSON.parse(prebody);
+//       for (i in body) {
+//         if (body[i] instanceof Object) {
+//             sqlStatement = "UPDATE cart SET quantity = "+
+//             body[i].quantity+" WHERE cartID = '"+ body[i].cartID+ "' AND productID = '"+body[i].productID+"';";
+//             console.log(sqlStatement);
+//     dBCon.query(sqlStatement, function (err, result) {
+//         if (err) {
+//           response.writeHead(resMsg.code=400, resMsg.hdrs);
+//           }else{
+//           response.writeHead(resMsg.code=201, resMsg.hdrs); 
+//         }  
+//         setHeader(resMsg);
+//         response.end(resMsg.body);
+//         dBCon.end();
+//         return resMsg.body;
+//       });
+//         }}
+//     })
+// }
 
-function updateLite(request, response) {
+function update(request, response) {
   let resMsg = {};
-  var dBCon = connectToLiteDatabase();
+  var dBCon = connectToDatabase();
   var prebody = '';
   var sqlStatement;
   request.on('data', function(data) {
@@ -85,4 +85,4 @@ class Item {
       this.price = price;
     }
   }
-module.exports = update, updateLite;
+module.exports = update;
