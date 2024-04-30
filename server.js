@@ -83,6 +83,7 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
 
+        let data = {};
         if ((path == '/member') || (path == '/discount') || (path == '/transaction') || (path == '/products') || (path == '/member/car')){
             try {
                 switch (`${method} ${path}`) {
@@ -103,7 +104,7 @@ const server = http.createServer((req, res) => {
         } else {
             try {
                 if (body) {
-                    let data = {};
+                    
                     data = JSON.parse(body);
                     requestData = JSON.parse(body);
                 }
