@@ -83,6 +83,7 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
         
+        //PARSHING JSON
         let data = {};
         if ((path == '/member') || (path == '/discount') || (path == '/transaction') || (path == '/products') || (path == '/member/car')){
             try {
@@ -114,9 +115,12 @@ const server = http.createServer((req, res) => {
                 return;
             }
         }
+        //END OF PARSING JSON
+
 
         switch (`${method} ${path}`) {
-
+            
+            //member requests
             case 'POST /member':
                 adminAddMember(req, res, requestData, lastMemberID, memberdb, function(newLastMemberID) {
                     lastMemberID = newLastMemberID;
@@ -136,6 +140,8 @@ const server = http.createServer((req, res) => {
                 adminGetMember(req,res,requestData,memberdb);
 
                 break;
+
+            //discount requests
             case 'POST /discount':
                 
                 adminAddDiscount(res,requestData,discountdb);
@@ -210,7 +216,7 @@ const server = http.createServer((req, res) => {
 
                 break;
 
-            //Tickets and customer service Requests
+            //Tickets and customer service Requests : some of these requests are in default case due to implementation issues
             case 'POST /tickets/create':
 
                 ticketController.createTicket({ body: data }, res);
@@ -280,7 +286,9 @@ const server = http.createServer((req, res) => {
             //     break;
 
             default:
-
+                
+                //couldnt implement these as switch cases so I put them here
+                
                 if (path.startsWith('/tickets/details/') && method === 'GET') {
                     const ticketId = path.split('/')[3];
                     // Now passing both params and query in the request object
