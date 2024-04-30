@@ -163,7 +163,7 @@ function applicationServer(request, response) {
         
       }
       if (regExpRemove.test(request.url)) {
-        console.log("removing");
+        console.log("removing in APIs");
         resMsg = removeItem(request, response);
         done = true;
         

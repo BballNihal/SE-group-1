@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Site</title>
+</head>
+<body>
+
+<h1>My profile</h1>
+
+
+<button onclick="back()">Back</button>
+<button onclick="viewOrders()">View Orders</button>
+<button onclick="goToCartPage()">View Cart</button>
+<div id="results"></div>
+
+<div id="cont1">
+    <input type="text">
+</div>
+
+<script>
+    function back() {
+        window.location.href = "search.html";
+    
+    }
+    function viewOrders() {
+        window.location.href = "myOrders.html";
+    
+    }
+    function goToCartPage() {
+        window.location.href = "myCart.html";
+    
+    }
+</script>
+
+</body>
+</html>

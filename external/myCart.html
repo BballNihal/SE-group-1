@@ -6,16 +6,26 @@
 <title>Auto Site</title>
 </head>
 <body>
-
-<h1>Enter item to remove from cart</h1>
+<h1>My Cart</h1>
+<h2>Enter item to remove from cart</h2>
 
 <input type="text" id="searchInput" placeholder="Search...">
 <button onclick="remover()">Remove</button>
-
+<input type="text" id="searchInput" placeholder="Search...">
+<button onclick="dispresults()">Display</button>
 <div id="results"></div>
 
-<script>
+<h2>Enter item to update quantity</h2>
+<input type="text" id="searchInputUpdate" placeholder="Search...">
+<button onclick="saveItemToUpdate()">Item to Update</button>
+<input type="text" id="searchInputQuantity" placeholder="Search...">
+<button onclick="updateQuantity()">Set quantity</button>
 
+<script>
+ var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
+function dispresults() {
+    console.log("Resp"+xmlhttp.response);
+}
 function remover() {
 
     var searchTerm = document.getElementById("searchInput").value.toLowerCase();
@@ -25,26 +35,84 @@ function remover() {
         console.log("removing")
         removeItemReq();
     }
-
     
     
         
 
 }
 function removeItemReq() {
+   /* var xhr = new XMLHttpRequest();
+xhr.open('POST', 'http://localhost:8000/cart/remove', true);
+xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+        var response = xhr.responseText;
+        // Process the response here
+        console.log(response);
+    }
+};
+xhr.send();*/
+
+////
+
     console.log("1");
     document.getElementById("results").innerText = "Removed Item2";
-    var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance 
-var theUrl = "/json-handler";
+var theUrl = "http://localhost:8000/cart/remove";
+/*fetch(theUrl)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Process the JSON data here
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });*/
 xmlhttp.open("POST", theUrl);
 xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 xmlhttp.send(JSON.stringify({ "ABC":{
    "cartID":"C1234567890",
    "productID":"P1234567890"
   }}));
-
-    xhr.send();
+  document.getElementById("results").innerText = "Sent";
+    //xmlhttp.send();
     console.log("sent");
+    var xhr = new XMLHttpRequest();
+xhr.open("POST", theUrl, true);
+xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        // Process the response here
+    }
+};
+xhr.send();
+}
+var itemToUpdate = "NULL";
+function saveItemToUpdate() {
+    var searchTerm = document.getElementById("searchInputUpdate").value.toLowerCase();
+    if (inMyCart(searchTerm)) {
+        itemToUpdate = searchTerm;
+        document.getElementById("results").innerText = "Item '"+searchTerm+"'' is in cart, enter new quantity.";
+    } else {
+        itemToUpdate = "NULL"
+        document.getElementById("results").innerText = "Item '" + searchTerm + "' not found";
+    }
+}
+function updateQuantity() {
+    var searchTerm = document.getElementById("searchInputQuantity").value.toLowerCase();
+    var newQuantity = parseInt(searchItem)
+    if (itemToUpdate != "NULL") {
+        //update quantity
+
+    } else {
+        document.getElementById("results").innerText = "No item to update given";
+    }
+}
+function inMyCart(item) {
+    //check cart, this return true is temporary
+    return true;
 }
 </script>
 

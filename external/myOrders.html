@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Site</title>
+</head>
+<body>
+
+<h1>My Orders</h1>
+
+
+
+<button onclick="displayOrders()">Display Orders</button>
+<button onclick="back()">Back</button>
+<button onclick="viewOrders()">View Orders</button>
+<button onclick="goToCartPage()">View Cart</button>
+<h2>Cancel Order</h2>
+<input type="text" id="searchCancelOrder" placeholder="Search...">
+<button onclick="cancelOrder()">Cancel</button>
+<div id="results"></div>
+
+<div id="cont1">
+    <input type="text">
+</div>
+
+<script>
+    function displayOrders(memberID) {
+
+        //add displayOrders here
+        document.getElementById("results").innerText = "Order1";
+    }
+    function back() {
+        window.location.href = "search.html";
+    
+    }
+    function viewOrders() {
+        window.location.href = "myCart.html";
+    
+    }
+    function goToCartPage() {
+        window.location.href = "myCart.html";
+    
+    }
+    function cancelOrder() {
+        //cancel order
+    }
+</script>
+
+</body>
+</html>

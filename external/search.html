@@ -7,17 +7,20 @@
 </head>
 <body>
 
-<h1>Search and Navigate Example</h1>
+<h1>Home Page</h1>
 
 <input type="text" id="searchInput" placeholder="Search...">
 <button onclick="searchAndNavigate()">Go</button>
 <h2>Register as member:</h2>>
 <button onclick="goToMembershipPage()">Go2</button>
-<h2>View Cart</h2>>
-<button onclick="goToCartPage()">Go2</button>
+<button onclick="goToCartPage()">Go to Cart Page</button>
+<button onclick="goToProfile()">View Profile</button>
 <div id="results"></div>
 
 <script>
+    function goToProfile() {
+        window.location.href = "myProfile.html";
+    }
     function goToMembershipPage() {
         window.location.href = "registerAsMember.html";
     

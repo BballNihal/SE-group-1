@@ -7,13 +7,12 @@
 </head>
 <body>
 
-<h1>Enter membership info</h1>
+
 
 print Results
-2
-3
+<h2>Add to Cart:</h2>
 <input type="text" id="searchInputB" placeholder="Search...">
-<button onclick="searchResults()">Enter</button>
+<button onclick="searchResults()">Add</button>
 
 <div id="results"></div>
 
@@ -42,7 +41,7 @@ function memberName() {
 
 }
 function searchResults() {
-    var searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    var searchTerm = document.getElementById("searchInputB").value.toLowerCase();
     
     switch (searchTerm) {
         default:
@@ -56,6 +55,9 @@ function searchResults() {
             }
         }
 
+}
+function browseItem(productID) {
+    
 }
 </script>
 
