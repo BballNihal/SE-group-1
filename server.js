@@ -118,7 +118,9 @@ const server = http.createServer((req, res) => {
         switch (`${method} ${path}`) {
 
             case 'POST /member':
-                lastMemberID = adminAddMember(req, res, requestData, lastMemberID, memberdb);
+                adminAddMember(req, res, requestData, lastMemberID, memberdb, function(newLastMemberID) {
+                    lastMemberID = newLastMemberID;
+                });
                 break;
             
             case 'PUT /member':
@@ -241,8 +243,11 @@ const server = http.createServer((req, res) => {
             
             //member car data
             case 'POST /member/car':
-                lastCarID = adminAddCarInfo(req, res, requestData, lastCarID, memberdb);
-                break;
+                case 'POST /car':
+                    adminAddCarInfo(req, res, requestData, lastCarID, memberdb, newLastCarID => {
+                        lastCarID = newLastCarID;
+                    });
+                    break;
     
             case 'PUT /member/car':
                 adminUpdateCarInfo(req, res, requestData, memberdb);
