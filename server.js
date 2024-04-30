@@ -25,6 +25,11 @@ const adminUpdateMember = require('./databases/adminUpdateMember.js');
 const adminDeleteMember = require('./databases/adminDeleteMember.js');
 const adminGetMember = require('./databases/adminGetMember.js');
 
+const adminAddCarInfo = require('./databases/adminAddCarInfo.js');
+const adminDeleteCarInfo = require('./databases/adminDeleteCarInfo.js');
+const adminGetCarInfo = require('./databases/adminGetCarInfo.js');
+const adminUpdateCarInfo = require('./databases/adminUpdateCarInfo.js');
+
 const adminAddDiscount = require('./databases/adminAddDiscount.js');
 const adminUpdateDiscount = require('./databases/adminUpdateDiscount.js');
 const adminDeleteDiscount = require('./databases/adminDeleteDiscount.js');
@@ -57,6 +62,7 @@ let productdb = new sqlite3.Database('./databases/productDB/products.db', (err) 
 });
 
 let lastMemberID = 0;
+let lastCarID = 0;
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -230,6 +236,22 @@ const server = http.createServer((req, res) => {
                 productController.editReview({ body: data }, res);
 
                 break;
+                
+            case 'POST /member/car':
+                lastCarID = adminAddCarInfo(req, res, requestData, lastCarID, memberdb);
+                break;
+    
+            case 'PUT /member/car':
+                adminUpdateCarInfo(req, res, requestData, memberdb);
+                break;
+    
+            case 'DELETE /member/car':
+                adminDeleteCarInfo(req, res, requestData, memberdb);
+                break;
+
+            case 'GET /member/car':
+                adminGetCarInfo(req, res, requestData, memberdb);
+                break;
             
             /*====================================================================================================================
             THIS COMMENTED CODE DOES NOT WORK SO I MOVED IT INTO THE DEFAULT CASE (all the cases with path starts with) IF SOMEONE 
@@ -305,10 +327,23 @@ memberdb.serialize(() => {
             });
     //     }
     // });
+    memberdb.run(`CREATE TABLE IF NOT EXISTS cars (carID TEXT, memberID TEXT, carMake TEXT, carModel TEXT, carYear INTEGER)`, (err) => {
+        if (err) {
+            console.error('Failed to create cars table:', err);
+            return;
+        }
+        console.log('Car Table created successfully.');
+    });
 
     memberdb.get(`SELECT memberID FROM members ORDER BY memberID DESC LIMIT 1`, (err, row) => {
         if (row) {
             lastMemberID = parseInt(row.memberID.substring(1));
+        }
+    });
+
+    memberdb.get(`SELECT carID FROM cars ORDER BY carID DESC LIMIT 1`, (err, row) => {
+        if (row) {
+            lastCarID = parseInt(row.carID.substring(1));
         }
     });
 });
