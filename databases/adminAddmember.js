@@ -3,7 +3,7 @@ const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
 const stringHash = require('./passwordHash.js');
 
-function adminAddMember(req, res, member, lastMemberID, memberdb) {
+function adminAddMember(req, res, member, lastMemberID, memberdb, callback) {
     //const member = JSON.parse(body);
 
     // Validation code
@@ -41,9 +41,9 @@ function adminAddMember(req, res, member, lastMemberID, memberdb) {
         res.end('No more member IDs available');
         return;
     }
-
+    lastMemberID = Number(lastMemberID);
     lastMemberID++;
-    member.memberID = 'M' + String(lastMemberID).padStart(10, '0');
+    member.memberID = 'M' + String(lastMemberID).padStart(10, '0'); 
 
     //encrypt password 
     hashPass = stringHash(member.password);
@@ -56,9 +56,8 @@ function adminAddMember(req, res, member, lastMemberID, memberdb) {
             res.end(`Database error${err}`);
         } else {
             res.end(`Member registered successfully. Your member ID is ${member.memberID}`);
-            return;
+            callback(lastMemberID);  
         }
     });
-    return lastMemberID;
 }
 module.exports = adminAddMember;

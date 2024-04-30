@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 
-function adminAddCarInfo(req, res, car, lastCarID, memberdb) {
+function adminAddCarInfo(req, res, car, lastCarID, memberdb, callback) {
     // Validation code
     const requiredProperties = ['memberID', 'carMake', 'carModel', 'carYear'];
     for (let prop of requiredProperties) {
@@ -31,18 +31,20 @@ function adminAddCarInfo(req, res, car, lastCarID, memberdb) {
         return;
     }
 
+    lastCarID = Number(lastCarID);
     lastCarID++;
+
     car.carID = 'C' + String(lastCarID).padStart(10, '0');
 
+    // Insert car and call callback with the new lastCarID
     memberdb.run(`INSERT INTO cars VALUES (?, ?, ?, ?, ?)`, [car.carID, car.memberID, car.carMake, car.carModel, car.carYear], function (err) {
         if (err) {
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end(`Database error: ${err}`);
         } else {
             res.end(`Car registered successfully. Your car ID is ${car.carID}`);
-            return;
+            callback(lastCarID);  // Call the callback with the new lastCarID
         }
     });
-    return lastCarID;
 }
 module.exports = adminAddCarInfo;
