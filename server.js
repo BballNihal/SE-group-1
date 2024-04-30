@@ -8,6 +8,7 @@ AUTHOR: Henry Sprigle
 
 Implemented password hashing to work with member database 
 Implemented Post, Put,and delete methods for discount and transaction database
+All methods for Databases valid data inputs
 AUTHOR: Thomas Vu Yum Powder
 
 Made Post, Put, Delete, and Get methods for product database compatible with code structure
@@ -19,41 +20,47 @@ const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
 const stringHash = require('./databases/passwordHash.js');
+require('./models/db');
+const querystring = require('querystring');
+const ticketController = require('./controllers/ticketController');
+const productController = require('./controllers/productController');
 
+
+//Member Functions
 const adminAddMember = require('./databases/adminAddmember.js');
 const adminUpdateMember = require('./databases/adminUpdateMember.js');
 const adminDeleteMember = require('./databases/adminDeleteMember.js');
 const adminGetMember = require('./databases/adminGetMember.js');
 
+//Car functions
 const adminAddCarInfo = require('./databases/adminAddCarInfo.js');
 const adminDeleteCarInfo = require('./databases/adminDeleteCarInfo.js');
 const adminGetCarInfo = require('./databases/adminGetCarInfo.js');
 const adminUpdateCarInfo = require('./databases/adminUpdateCarInfo.js');
 
+//Discount Functions
 const adminAddDiscount = require('./databases/adminAddDiscount.js');
 const adminUpdateDiscount = require('./databases/adminUpdateDiscount.js');
 const adminDeleteDiscount = require('./databases/adminDeleteDiscount.js');
+const adminGetDiscount = require('./databases/adminGetDiscount.js');
 
+//Transaction Functions
 const adminAddTransaction = require('./databases/adminAddTransaction.js');
 const adminUpdateTransaction = require('./databases/adminUpdateTransaction.js');
 const adminDeleteTransction = require ('./databases/adminDeleteTransaction.js');
+const adminGetTransaction = require('./databases/adminGetTransaction.js');
 
+//Product Functions
 const {getProducts} = require('./databases/getProducts.js');
 const {updateProductQuantity} = require('./databases/updateProductQuantity.js');
 const {deleteProductFromDatabase} = require('./databases/deleteProductFromDatabase.js');
 const {addProductToDatabase} = require('./databases/addProductToDatabase.js');
 
-const ticketController = require('./controllers/ticketController');
-const productController = require('./controllers/productController');
 
-require('./models/db');
-
-const querystring = require('querystring');
 
 let memberdb = new sqlite3.Database('./databases/memberData.db');
 let discountdb = new sqlite3.Database('./databases/discountData.db');
 let transactiondb = new sqlite3.Database('./databases/transactionData.db');
-
 let productdb = new sqlite3.Database('./databases/productDB/products.db', (err) => {
     if (err) {
       console.error(err.message);
@@ -117,7 +124,8 @@ const server = http.createServer((req, res) => {
         }
         //END OF PARSING JSON
 
-
+        //Flag for Discount and Transcation Get functions
+        let writeGet = 1;
         switch (`${method} ${path}`) {
             
             //member requests
@@ -141,7 +149,9 @@ const server = http.createServer((req, res) => {
 
                 break;
 
-            //discount requests
+            //--End of Member Request -- 
+                
+            //--discount requests--
             case 'POST /discount':
                 
                 adminAddDiscount(res,requestData,discountdb);
@@ -159,9 +169,16 @@ const server = http.createServer((req, res) => {
                 adminDeleteDiscount(res,requestData,discountdb);
                 
                 break;//end of case delete /discount
+                
+            case'GET /discount':
+                writeGet = 1;
+                adminGetDiscount(res,requestData,discountdb,writeGet);
 
+            break;
 
-            //Transaction Database Request
+            //--End of Discount Request-- 
+
+            //--Transaction Database Request--
             case 'POST /transaction':
 
                 adminAddTransaction(res,requestData,transactiondb);
@@ -182,12 +199,15 @@ const server = http.createServer((req, res) => {
                 break;//end of case delete /transaction
 
             case 'GET /transaction':
-
-                adminGetTransaction(req,res,requestData,transactiondb);
+                writeGet =1;
+                adminGetTransaction(res,requestData,transactiondb,writeGet);
                 
                 break;    
 
-            //Product Database Requests
+
+            //--End of Transaction Requests--
+
+            //--Product Database Requests--
             case 'GET /products':
 
                 const productIDget = reqUrl.query.productID; // Extract productID from parsed query
@@ -216,6 +236,9 @@ const server = http.createServer((req, res) => {
 
                 break;
 
+            //--End of Product Requests--
+
+                
             //Tickets and customer service Requests : some of these requests are in default case due to implementation issues
             case 'POST /tickets/create':
 
@@ -246,7 +269,9 @@ const server = http.createServer((req, res) => {
                 productController.editReview({ body: data }, res);
 
                 break;
-            
+
+            //--End of Ticket --
+
             //member car data
             case 'POST /member/car':
                 case 'POST /car':
