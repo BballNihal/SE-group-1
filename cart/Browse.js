@@ -2,7 +2,7 @@
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
 const verify = require('../verify.js');
-const searchFunction = require('../searchFunction.js');
+const searchFunction = require('../SearchFunction/Search/searchItem.js');
 /*browse description of one product 
 GET search/browse (GET browse)
 format:
