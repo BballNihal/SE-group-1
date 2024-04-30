@@ -42,7 +42,7 @@ db.run(`CREATE TABLE products (
       }
       // validate the format
       let price = product.price.replace(/,/g, '');
-      if (!/^\$\d+(\.\d+)?$/.test(price)) {
+      if (!/^\$\d+\.\d{2}$/.test(product.price)) {
         console.log(`Product ${product.productID} not added: Invalid price format.`);
         return;
       }

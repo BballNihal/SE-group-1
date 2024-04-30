@@ -1,3 +1,6 @@
+//Product db http requests
+//AUTHOR: NIHAL ABDUL MUNEER
+
 const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
