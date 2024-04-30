@@ -5,7 +5,6 @@ const config = require('./config.js');
 const dateMaker = require('./dateMaker.js');
 const weekendOrHoliday = require('./weekendOrHoliday.js');
 */const connectToDatabase = require('./connectToDatabase.js');
-const connectToLiteDatabase = require('./connectToDatabase.js');
 //const addEventSingle = require('./addEventSingle.js');
 /*const cancelSingle = require('./cancelSingle.js');
 const lookupSingle = require('./lookupSingle.js');

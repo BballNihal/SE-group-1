@@ -10,7 +10,7 @@ format:
 
 const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
-const c = require('config');
+
 //set order status to cancelled if it is pending
 // function cancelOrder(request,response) {
 //       let resMsg = {};

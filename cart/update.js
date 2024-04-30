@@ -1,13 +1,4 @@
-
-function setHeader(resMsg){
-    if (!resMsg.headers || resMsg.headers === null) {
-        resMsg.headers = {};
-      }
-      if (!resMsg.headers["Content-Type"]) {
-        resMsg.headers["Content-Type"] = "application/json";
-      }
-  
-  }
+const setHeader = require('../setHeader.js');
 const connectToDatabase = require('../connectToDatabase.js');
 
 
