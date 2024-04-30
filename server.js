@@ -383,16 +383,27 @@ server.listen(port, hostname, () => {
 // clearDatabase(memberdb);
 // dDropDatabase(discountdb);
 // function clearDatabase(db) {
-//   db.serialize(() => {
-//     db.run(`DELETE FROM members`, (err) => {
-//       if (err) {
-//         console.error('Failed to clear table:', err);
-//         return;
-//       }
-//       console.log('Table cleared successfully.');
-//       lastMemberID = 0;  // Reset lastMemberID here
+//     db.serialize(() => {
+//         // Clear the members table
+//         db.run(`DELETE FROM members`, (err) => {
+//             if (err) {
+//                 console.error('Failed to clear members table:', err);
+//                 return;
+//             }
+//             console.log('Members table cleared successfully.');
+//             lastMemberID = 0;  // Reset lastMemberID here
+//         });
+
+//         // Clear the cars table
+//         db.run(`DELETE FROM cars`, (err) => {
+//             if (err) {
+//                 console.error('Failed to clear cars table:', err);
+//                 return;
+//             }
+//             console.log('Cars table cleared successfully.');
+//             lastCarID = 0;  // Reset lastCarID here
+//         });
 //     });
-//   });
 // }
 
 // function dDropDatabase(db) {
