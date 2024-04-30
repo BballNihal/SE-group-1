@@ -2,7 +2,28 @@
 const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
-function adminUpdateTransaction (res,requestData,transactiondb){
+const dataValidation = require('./dataValidation.js');
+
+function adminUpdateTransaction(res, requestData, transactiondb) {
+
+    //--data validation --
+    
+    var requiredProperties = ['orderId'];
+
+    if(requestData.hasOwnProperty('deliveryStatus')){
+
+        requiredProperties.push('deliveryStatus');
+    }
+
+    if (requestData.hasOwnProperty('productId')) {
+
+        requiredProperties.push('productId');
+
+    }
+
+    if(!(dataValidation(res,requestData,requiredProperties))){
+        return; 
+    }
 
 
     //updating transaction database
@@ -15,14 +36,14 @@ function adminUpdateTransaction (res,requestData,transactiondb){
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end(`Transaction Database error: No matching orderID in database `);
             return;
-        }
-        else {
+        }else {
+
+            res.writeHead(200,{'Content-Type' : 'text/plain'});
             res.end(`Transaction ${requestData.orderId} sucessfully updated `);
         }
 
     });//end of database update
 
-
     return;
-}
+}//End of function
 module.exports = adminUpdateTransaction;
