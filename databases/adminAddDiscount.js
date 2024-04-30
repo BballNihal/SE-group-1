@@ -1,30 +1,18 @@
-
 const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
+const dataValidation = require('./dataValidation.js');
+
 
 
 function adminAddDiscount(res,requestData,discountdb){
     //data validation 
-    const requiredDiscountProperties = ['productId', 'discountCode', 'discountAmount'];
-    for (let prop of requiredDiscountProperties) {
-        if (!requestData.hasOwnProperty(prop)) {
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end(`Missing required property: ${prop}`);
-            return;
-        }
-    }
+    const requiredProperties = ['productId', 'discountCode', 'discountAmount'];
 
-    //checking for empty IDs
-    for (let i = 0; i < requiredDiscountProperties.length; i++) {
-        let property = requiredDiscountProperties[i];
-        if (requestData[property].length === 0) {
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end(`Error : Missing ${property} `);
-            return;
-        }
+    if(!(dataValidation(res,requestData,requiredProperties))){
+        return; 
     }
-
+    
 
     //inserting discounts inot the discount database
     discountdb.run(`INSERT INTO discount VALUES (?,?,?)`, [requestData.productId, requestData.discountCode, requestData.discountAmount], function (err) {

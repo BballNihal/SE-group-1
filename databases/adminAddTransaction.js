@@ -1,29 +1,16 @@
+
 const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
-
+const dataValidation = require('./dataValidation.js');
 
 function adminAddTransaction(res,requestData,transactiondb){
 
+    //--data validation --
+    let requiredProperties = ['orderId','productId','deliveryStatus'];
 
-    //data validation 
-    const requiredTransactionProperties = ['orderId', 'productId', 'deliveryStatus'];
-    for (let prop of requiredTransactionProperties) {
-        if (!requestData.hasOwnProperty(prop)) {
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end(`Missing required property: ${prop}`);
-            return;
-        }
-    }
-
-    //checking for empty IDs
-    for (let i = 0; i < requiredTransactionProperties.length; i++) {
-        let property = requiredTransactionProperties[i];
-        if (requestData[property].length === 0) {
-            res.writeHead(400, { 'Content-Type': 'text/plain' });
-            res.end(`Error : Missing ${property} `);
-            return;
-        }
+    if(!(dataValidation(res,requestData,requiredProperties))){
+        return; 
     }
 
     //inserting transaction into the transaction database

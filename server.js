@@ -73,8 +73,7 @@ const server = http.createServer((req, res) => {
     const method = req.method;
 
     const queryParams = reqUrl.query;
-    
-
+ 
     //Discount database requests
     
     let body = '';
@@ -84,34 +83,36 @@ const server = http.createServer((req, res) => {
 
     req.on('end', () => {
 
-        let data = {};
-        try {
-            if (body) {
-                data = JSON.parse(body);
-                requestData = data;
-            }
-        } catch (e) {
-            res.statusCode = 400;
-            res.end(JSON.stringify({ error: "Invalid JSON body." }));
-            return;
-        }
-
-        //  try {
-        //     switch (`${method} ${path}`) {
-
-        //         case 'GET /products':
-        //             break;
+        if ((path == '/member') || (path == '/discount') || (path == '/transaction') || (path == '/products') || (path == '/member/car')){
+            try {
+                switch (`${method} ${path}`) {
+    
+                    case 'GET /products':
+                        break;
+                    
+                    default:
+                        var requestData = JSON.parse(body);
+                        break;
+                }
                 
-        //         default:
-        //             var requestData = JSON.parse(body);
-        //             break;
-        //     }
-            
-        //  } catch (error){
-        //      res.writeHead(400, { 'Content-Type': 'text/plain' });
-        //      res.end(`Error parsing: ${error}`);
-        //      return;
-        //  }
+             } catch (error){
+                 res.writeHead(400, { 'Content-Type': 'text/plain' });
+                 res.end(`Error parsing: ${error}`);
+                 return;
+             }
+        } else {
+            try {
+                if (body) {
+                    let data = {};
+                    data = JSON.parse(body);
+                    requestData = JSON.parse(body);
+                }
+            } catch (e) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: "Invalid JSON body." }));
+                return;
+            }
+        }
 
         switch (`${method} ${path}`) {
 
@@ -206,7 +207,7 @@ const server = http.createServer((req, res) => {
 
                 break;
 
-            //Tickets Requests
+            //Tickets and customer service Requests
             case 'POST /tickets/create':
 
                 ticketController.createTicket({ body: data }, res);
@@ -236,7 +237,8 @@ const server = http.createServer((req, res) => {
                 productController.editReview({ body: data }, res);
 
                 break;
-                
+            
+            //member car data
             case 'POST /member/car':
                 lastCarID = adminAddCarInfo(req, res, requestData, lastCarID, memberdb);
                 break;
