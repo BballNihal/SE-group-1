@@ -99,7 +99,7 @@ const server = http.createServer(async (req, res) => {
 
                 db.get('SELECT username FROM members WHERE userid = ?', userid, (err, row) => {
                     if (err) {
-                        res.writeHead(500, { 'Content-Type': 'text/plain' });
+                        res.writeHead(500, { 'Content-Type': 'text/plain' });member
                         res.end('Database Error');
                     } else {
                         if (row) {
