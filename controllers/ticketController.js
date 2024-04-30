@@ -182,10 +182,6 @@ exports.openTicket = (req, res) => {
 };
 
 
-
-
-
-
 exports.getFAQs = (req, res) => {
     const faqFilePath = path.join(__dirname, '..', 'scraped_faq.txt'); // Adjust the path as necessary
 
