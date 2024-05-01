@@ -11,6 +11,13 @@ function adminUpdateCarInfo(req, res, car, memberdb) {
         }
     }
 
+    const carIDRegex = /^C\d{10}$/;
+    if (!carIDRegex.test(car.carID)) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Member ID must start with "C" followed by a 10 digit number');
+        return;
+    }
+    
     const memberIDRegex = /^M\d{10}$/;
     if (!memberIDRegex.test(car.memberID)) {
         res.writeHead(400, { 'Content-Type': 'text/plain' });
