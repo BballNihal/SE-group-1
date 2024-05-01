@@ -23,11 +23,14 @@ const http = require('http');
 const url = require('url');
 const sqlite3 = require('sqlite3').verbose();
 const stringHash = require('./databases/passwordHash.js');
+const express = require('express');
+const app = express();
 require('./models/db');
 const querystring = require('querystring');
 const ticketController = require('./controllers/ticketController');
 const productController = require('./controllers/productController');
 
+app.use(express.static('public'));
 
 //Member Functions
 const adminAddMember = require('./databases/adminAddmember.js');

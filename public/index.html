@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Member Management System</h1>
+    </header>
+
+    <main>
+        <section id="addMember">
+            <h2>Add Member</h2>
+            <form id="addMemberForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <label for="phoneNumber">Phone Number:</label>
+                <input type="text" id="phoneNumber" name="phoneNumber" required>
+                <label for="adminStatus">Admin Status:</label>
+                <input type="checkbox" id="adminStatus" name="adminStatus">
+                <button type="submit">Add Member</button>
+            </form>
+        </section>
+
+        <section id="memberList">
+            <h2>Member List</h2>
+            <ul id="members"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Member Management System</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
