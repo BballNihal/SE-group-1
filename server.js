@@ -29,8 +29,21 @@ require('./models/db');
 const querystring = require('querystring');
 const ticketController = require('./controllers/ticketController');
 const productController = require('./controllers/productController');
-
+const {verifyToken, generateRandomKey, generateToken} = require('./generateToken.js');
+const validatePassword = require('./validatePassword.js');
+const {hashPassword, comparePassword} = require('./hashComparePassword.js');
+const axios = require('axios');
+const bcrypt = require('bcrypt');
+const { OAuth2Client } = require('google-auth-library');
+const jwt = require('jsonwebtoken');
 app.use(express.static('public'));
+
+//Client Member Functions
+const handleLoginRequest = require('./logInReq.js');
+const handleUpdateMemberRequest = require('./updateMemberReq.js');
+const handleSignupRequest = require('signUpRequests.js');
+const handleCancelMemberRequest = require('./handleCancelMemberRequest');
+const {verifyGoogle, redirectToGoogleSignIn} = require('./googleVerification.js');
 
 //Member Functions
 const adminAddMember = require('./databases/adminAddmember.js');
@@ -156,6 +169,32 @@ const server = http.createServer((req, res) => {
                 break;
 
             //--End of Member Request -- 
+                
+            //--Client Member Request --
+
+                
+        switch (`${method} ${path}`) {
+            case 'POST /signup':
+                handleSignupRequest(req, res, db);
+                break;
+            case 'POST /login':
+                handleLoginRequest(req, res, db);
+                break;
+            case 'DELETE /member/cancel':
+                handleCancelMemberRequest(req, res, db);
+                break;
+            case 'PUT /member/update':
+                handleUpdateMemberRequest(req, res, db);
+                break;
+            case 'GET /auth/google':
+                redirectToGoogleSignIn(req, res, db);
+                break;
+            case 'GET /auth/google/callback':
+                verifyGoogle(req, res, db);
+                break;
+        }
+
+            //--End of Client MemReq -- 
                 
             //--discount requests--
             case 'POST /discount':
