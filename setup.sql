@@ -1,0 +1,41 @@
+DROP TABLE IF EXISTS cart;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS appointments;
+
+CREATE TABLE products(
+nameVar TEXT,
+descriptionVar TEXT,
+manufacturer TEXT,
+price REAL,
+premiumStatus INTEGER,
+availability INTEGER,
+productID TEXT,
+id INTEGER PRIMARY KEY AUTOINCREMENT
+);
+
+CREATE TABLE orders(
+cartID TEXT NOT NULL,
+paymentInfo TEXT,
+discountCode REAL,
+price REAL,
+orderID TEXT NOT NULL,
+memberID TEXT,
+status TEXT,
+id INTEGER PRIMARY KEY AUTOINCREMENT
+);
+
+CREATE TABLE appointments(
+memberID TEXT,
+time TEXT,
+Specification TEXT,
+appointmentID TEXT NOT NULL,
+id INTEGER PRIMARY KEY AUTOINCREMENT
+);
+
+CREATE TABLE cart (
+cartID TEXT NOT NULL,
+productID TEXT NOT NULL,
+quantity INTEGER NOT NULL,
+id INTEGER PRIMARY KEY AUTOINCREMENT
+);

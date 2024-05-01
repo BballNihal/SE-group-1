@@ -11,3 +11,7 @@ select * from products;
 (in another file from the one that creates the databases)
 ____________________________
 Use database from subgroup 1
+
+Test database: 
+sqlite3 database.db
+.read setup.sql
