@@ -10,7 +10,7 @@ function adminDeleteCarInfo(req, res, car, memberdb) {
 
     const carID = car.carID;
 
-    const carIDRegex = /^C\d{5}$/;
+    const carIDRegex = /^C\d{10}$/;
     if (!carIDRegex.test(car.carID)) {
         res.writeHead(400, { 'Content-Type': 'text/plain' });
         res.end('Invalid CarID');
