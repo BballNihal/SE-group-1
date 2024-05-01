@@ -10,11 +10,17 @@ Password validation is not currently included
 The cart, order, and support ids are expanded to 10 numbers instead 
 of 5 (based on the feedback), the product id is 16 numbers
 */
-
+const sta = require('./idStandard.js');
 //todo: R, 1-100 number,password
 console.log(verify("discountCode","2A3B4F"));
 function verify(type,id){
 if (typeof id == "string") {
+    const typeInfo = sta[type];
+    if (typeInfo) { // if the type is in the standard list
+        if (id[0] == typeInfo.prefix && id.length == typeInfo.length && !isNaN(id.substring(1, typeInfo.length))) {
+            return true;
+        }
+    } 
     if (type =="cart") {
         if (id[0]=="C" & id.length == 11 & !isNaN(id.substring(1,11))) {
             return true;

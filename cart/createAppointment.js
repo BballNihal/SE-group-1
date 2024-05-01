@@ -54,7 +54,7 @@ format:
 //         }}
 //     })
 // }
-
+const sta = require('../idStandard.js');
 function createAppointment(request, response) {
     let resMsg = {};
     let db = connectToDatabase();
@@ -68,7 +68,8 @@ function createAppointment(request, response) {
         for (let i in body) {
             if (body[i] instanceof Object) {
                 if (verify("member", body[i].memberID) && verify("date", body[i].time) && verify("specification", body[i].specification)) {
-                    let appointmentID = "A" + encrytionID(6, body[i].memberID, body[i].time, body[i].specification);
+                    //let appointmentID = "A" + encrytionID(6, body[i].memberID, body[i].time, body[i].specification);
+                    let appointmentID = sta.appointment.prefex+encrytionID(sta.appointment.length, body[i].memberID, body[i].time, body[i].specification);
                     sqlStatement = `INSERT INTO appointments(memberID, appointmentTime, specification, appointmentID) VALUES (?, ?, ?, ?)`;
                     console.log(sqlStatement);
 

@@ -57,7 +57,7 @@ format:
 //           }}
 //     })
 // }
-
+const sta = require('../idStandard.js');
 function placeOrder(request, response) {
     let resMsg = {};
     let db = connectToDatabase();
@@ -67,8 +67,8 @@ function placeOrder(request, response) {
     request.on('data', function(data) {
         prebody += data;
         let body = JSON.parse(prebody);
-        var orderID = 'O' + encrytionID(10, body[0].cartID, body[0].paymentInfo, body[0].discountCode, body[0].price, body[0].memberID);
-
+        //var orderID = 'O' + encrytionID(10, body[0].cartID, body[0].paymentInfo, body[0].discountCode, body[0].price, body[0].memberID);
+        var orderID = sta.order.prefix + encrytionID(sta.order.length, body[0].cartID, body[0].paymentInfo, body[0].discountCode, body[0].price, body[0].memberID);
         for (let i in body) {
             if (body[i] instanceof Object) {
                 if (verify("discountCode", body[i].discountCode) && verify("cart", body[i].cartID) && verify("string", body[i].paymentInfo) && !isNaN(body[i].price)) {
