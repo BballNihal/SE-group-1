@@ -41,8 +41,8 @@ app.use(express.static('public'));
 //Client Member Functions
 const handleLoginRequest = require('./logInReq.js');
 const handleUpdateMemberRequest = require('./updateMemberReq.js');
-const handleSignupRequest = require('signUpRequests.js');
-const handleCancelMemberRequest = require('./handleCancelMemberRequest');
+const handleSignupRequest = require('./signUpRequests.js');
+const handleCancelMemberRequest = require('./handleCancelMemberRequest.js');
 const {verifyGoogle, redirectToGoogleSignIn} = require('./googleVerification.js');
 
 //Member Functions
@@ -175,22 +175,22 @@ const server = http.createServer((req, res) => {
                 
         switch (`${method} ${path}`) {
             case 'POST /signup':
-                handleSignupRequest(req, res, db);
+                handleSignupRequest(req, res, memberdb);
                 break;
             case 'POST /login':
-                handleLoginRequest(req, res, db);
+                handleLoginRequest(req, res, memberdb);
                 break;
             case 'DELETE /member/cancel':
-                handleCancelMemberRequest(req, res, db);
+                handleCancelMemberRequest(req, res, memberdb);
                 break;
             case 'PUT /member/update':
-                handleUpdateMemberRequest(req, res, db);
+                handleUpdateMemberRequest(req, res, memberdb);
                 break;
             case 'GET /auth/google':
-                redirectToGoogleSignIn(req, res, db);
+                redirectToGoogleSignIn(req, res, memberdb);
                 break;
             case 'GET /auth/google/callback':
-                verifyGoogle(req, res, db);
+                verifyGoogle(req, res, memberdb);
                 break;
         }
 
