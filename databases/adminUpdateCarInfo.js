@@ -11,7 +11,7 @@ function adminUpdateCarInfo(req, res, car, memberdb) {
         }
     }
 
-    const memberIDRegex = /^M\d{5}$/;
+    const memberIDRegex = /^M\d{10}$/;
     if (!memberIDRegex.test(car.memberID)) {
         res.writeHead(400, { 'Content-Type': 'text/plain' });
         res.end('Member ID must start with "M" followed by a 5 digit number');
