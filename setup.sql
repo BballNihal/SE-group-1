@@ -3,27 +3,24 @@ DROP TABLE IF EXISTS products;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS appointments;
 
-CREATE TABLE products(
-nameVar TEXT,
-descriptionVar TEXT,
-manufacturer TEXT,
-price REAL,
-premiumStatus INTEGER,
-availability INTEGER,
-productID TEXT,
-id INTEGER PRIMARY KEY AUTOINCREMENT
+CREATE TABLE IF NOT EXISTS products (
+    productID TEXT PRIMARY KEY,
+    productType TEXT,
+    name TEXT,
+    price TEXT,
+    quantity INTEGER
 );
 
-CREATE TABLE orders(
-cartID TEXT NOT NULL,
-paymentInfo TEXT,
-discountCode REAL,
-price REAL,
-orderID TEXT NOT NULL,
-memberID TEXT,
-status TEXT,
-id INTEGER PRIMARY KEY AUTOINCREMENT
+CREATE TABLE IF NOT EXISTS orders (
+    cartID TEXT,
+    paymentInfo TEXT,
+    discountCode TEXT,
+    price TEXT,
+    orderID TEXT PRIMARY KEY,
+    memberID TEXT,
+    statusVar TEXT
 );
+
 
 CREATE TABLE appointments(
 memberID TEXT,

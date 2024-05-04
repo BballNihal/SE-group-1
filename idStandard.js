@@ -2,7 +2,7 @@
 const sta = {
     cart: {
         prefix: "C",
-        length: 11, // 10 + 1
+        length: 17, // 10 + 1
     },
     product: {
         prefix: "P",
