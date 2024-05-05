@@ -25,7 +25,7 @@ function adminAddCarInfo(req, res, car, lastCarID, memberdb, callback) {
         return;
     }
 
-    if (lastCarID >= 99999) {
+    if (lastCarID >= 9999999999) {
         res.writeHead(500, { 'Content-Type': 'text/plain' });
         res.end('No more car IDs available');
         return;
