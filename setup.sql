@@ -16,10 +16,12 @@ CREATE TABLE IF NOT EXISTS orders (
     paymentInfo TEXT,
     discountCode TEXT,
     price TEXT,
-    orderID TEXT PRIMARY KEY,
+    orderID TEXT,
     memberID TEXT,
     statusVar TEXT
+    id INTEGER PRIMARY KEY AUTOINCREMENT
 );
+
 
 
 CREATE TABLE appointments(
