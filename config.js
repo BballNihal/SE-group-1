@@ -12,7 +12,8 @@ const config = {
     },
     sqliteDB: {
         path: "./database.db",//for the program in the root (or same directory as the database file)
-        pathLow: "../database.db"//for cart, search and any program that is not in the root
+        pathOne: "../database.db",//for cart, search and any program that is not in the root and have to go up one directory
+        pathTwo: "../../database.db"//for search and any program that is not in the root and have to go up two directories
     }
     
 };
