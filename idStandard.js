@@ -30,7 +30,7 @@ const sta = {
     },
     member: {
         prefix: "M",
-        length: 17,
+        length: 11,
     }
 };
 module.exports = sta;

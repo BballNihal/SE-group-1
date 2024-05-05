@@ -12,52 +12,17 @@ of 5 (based on the feedback), the product id is 16 numbers
 */
 
 //todo: R, 1-100 number,password
+const sta = require('./idStandard.js');
 console.log(verify("discountCode","2A3B4F"));
 function verify(type,id){
 if (typeof id == "string") {
-    if (type =="cart") {
-        if (id[0]=="C" & id.length == 11 & !isNaN(id.substring(1,11))) {
+    //check if the type is in the standard if yes, use the standard to verify (included id:cart,product,order,review,vehicle,support,appointment,member)
+    if (sta[type] != undefined) {
+        if (id[0]==sta[type].prefix & id.length == sta[type].length) {
             return true;
         }
         return false;
-    } else if (type =="product") {
-        if (id[0]=="P" & id.length == 17 & !isNaN(id.substring(1,17))) {
-            return true;
-        }
-        return false;
-    } else if (type =="order") {//an order id
-        if (id[0]=="O" & id.length == 11 & !isNaN(id.substring(1,11))) {
-            return true;
-        }
-        return false;
-    }  else if (type =="review") {//a review id
-        if (id[0]=="R" & id.length == 11 & !isNaN(id.substring(1,11))) {
-            return true;
-        }
-        return false;
-    }  else if (type =="vehicle") {//a vehicle id
-        if (id[0]=="V" & id.length == 11 & !isNaN(id.substring(1,11))) {
-            return true;
-        }
-        return false;
-    } else if (type =="support") {//a support id
-        if (id[0]=="S" & id.length == 11 & !isNaN(id.substring(1,11))) {
-            return true;
-        }
-        return false;
-    }else if (type == "appointment") {
-        if (id[0]=="A" & id.length == 7 & !isNaN(id.substring(1,11))) {
-            return true;
-        }
-        return false;
-    } else if (type =="member") {
-        //Should member be distinct from cart? (since 
-        //it doesn't seem to make sense for a member
-        //to have multiple carts)
-        if (id[0]=="M" & id.length == 17 & !isNaN(id.substring(1,17))) {
-            return true;
-        }
-        return false;
+    //if the type is not in the standard, use the following:
     } else if (type =="search") {//input for the search bar
         if (id.length >= 5 & id.length <= 20) {
             return true;
