@@ -58,9 +58,23 @@ const {getProducts} = require('./databases/getProducts.js');
 const {updateProductQuantity} = require('./databases/updateProductQuantity.js');
 const {deleteProductFromDatabase} = require('./databases/deleteProductFromDatabase.js');
 const {addProductToDatabase} = require('./databases/addProductToDatabase.js');
+//Cart Functions
+//Cart Functions
+const {addItem} = require('./databases/cart/addItem.js');
+ const {tester}=require('./databases/cart/tester.js');
+const {clearCart} = require('./databases/cart/clearCart.js');
+const {removeItem} = require('./databases/cart/removeItem.js');
+const {update} = require('./databases/cart/update.js');
+const {browse} = require('./databases/cart/browse.js');
+const {cancelOrder} = require('./databases/cart/cancelOrder.js');
+const {createAppointment} = require('./databases/cart/createAppointment.js');
+const {listOrderDetails} = require('./databases/cart/listOrderDetails.js');
+const {listOrders} = require('./databases/cart/listOrders.js');
+const {placeOrder} = require('./databases/cart/placeOrder.js');
+const {removeAppointment} = require('./databases/cart/removeAppointment.js');
+const {viewAppointment} = require('./databases/cart/viewAppointment.js');
 
-
-
+let cartdb = new sqlite3.Database('./databases/cart.db');
 let memberdb = new sqlite3.Database('./databases/memberData.db');
 let discountdb = new sqlite3.Database('./databases/discountData.db');
 let transactiondb = new sqlite3.Database('./databases/transactionData.db');
@@ -130,7 +144,47 @@ const server = http.createServer((req, res) => {
         //Flag for Discount and Transcation Get functions
         let writeGet = 1;
         switch (`${method} ${path}`) {
-            
+            //Cart Requests
+               //--Cart Database Requests--
+               case 'POST /cart/add':
+                // console.log(tester());
+                console.log(requestData.cartID);
+                 tester(req,res,requestData,cartdb);
+                 break;
+             case 'POST /cart/clear':
+                 clearCart(req,res,requestData,cartdb);
+                 break;
+             case 'POST /cart/update':
+                     update(req,res,requestData,cartdb);
+             break;
+             case 'POST /cart/remove':
+                 removeItem(req,res,requestData,cartdb);
+                 break;
+                 case 'GET /search/browse':
+                     browse(req,res,requestData,cartdb);
+     break;
+     case 'POST /order/cancel':
+                     cancelOrder(req,res,requestData,cartdb);
+     break;
+     case 'GET /order/details':
+                     listOrderDetails(req,res,requestData,cartdb);
+     break;
+     case 'GET /order/list':
+                     listOrders(req,res,requestData,cartdb);
+     break;
+     case 'POST /order/add':
+                     placeOrder(req,res,requestData,cartdb);
+     break;
+     case 'POST /appointment/remove':
+                     removeAppointment(req,res,requestData,cartdb);
+     break;
+     case 'POST /appointment/create':
+                     createAppointment(req,res,requestData,cartdb);
+     break;
+     case 'GET /appointment/view':
+                     viewAppointment(req,res,requestData,cartdb);
+     break;
+            //End Cart Requests
             //member requests
             case 'POST /member':
                 adminAddMember(req, res, requestData, lastMemberID, memberdb, function(newLastMemberID) {
@@ -180,7 +234,7 @@ const server = http.createServer((req, res) => {
             break;
 
             //--End of Discount Request-- 
-
+            
             //--Transaction Database Request--
             case 'POST /transaction':
 
