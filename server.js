@@ -173,7 +173,6 @@ const server = http.createServer((req, res) => {
             //--Client Member Request --
 
                 
-        switch (`${method} ${path}`) {
             case 'POST /signup':
                 handleSignupRequest(req, res, memberdb);
                 break;
@@ -192,7 +191,7 @@ const server = http.createServer((req, res) => {
             case 'GET /auth/google/callback':
                 verifyGoogle(req, res, memberdb);
                 break;
-        }
+        
 
             //--End of Client MemReq -- 
                 
