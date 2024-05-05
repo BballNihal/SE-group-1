@@ -1,4 +1,5 @@
-// Purpose: Define the standards for the data in the code. Use to maintain consistency in code.(Not used yet)
+// Purpose: Define the standards for the data in the code. Use to maintain consistency in code.
+// length: the length of the id +1
 const sta = {
     cart: {
         prefix: "C",
